@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shuhao.clean.apps.validate.dao.MetaDataUtilsDao">
+	
+	<!-- 按ID列表批量查询元数据 -->
+	<select id="getUppMetadatas" resultType="com.shuhao.clean.apps.meta.entity.UppMetadata" parameterType="string">
+		select t1.* 
+	    from
+		upp_metadata t1
+		where t1.metadata_id in ('${metaIds}')
+	</select>
+	
+	<!-- 查询单个元数据 -->
+	<select id="getUppMetadata" resultType="com.shuhao.clean.apps.meta.entity.UppMetadata" parameterType="string">
+		select t1.* 
+	    from
+		upp_metadata t1
+		where t1.metadata_id = #{metaId}
+	</select>
+	
+	<!-- 查询第一级子元数据 -->
+	<select id="getUppMetadataByPid" resultType="com.shuhao.clean.apps.meta.entity.UppMetadata" parameterType="string">
+		select t1.* 
+	    from
+		upp_metadata t1
+		where t1.parent_metadata_id = #{metaId}
+	</select>
+	
+	<!-- 查询表元数据,对应表 -->
+	<select id="getTableMeta" resultType="com.shuhao.clean.apps.meta.entity.UppMetadata" parameterType="map">
+		select t.*
+	     from upp_tmpl_page c, upp_dic_fn_rela b, upp_metadata t
+	    where c.is_curr_version = 'Y'
+	      and c.tmpl_id = #{templateId}
+	      and c.page_element_id = b.metadata_id
+	      and b.db_obj_id = t.metadata_id
+	</select>
+	
+	<!-- 查询数据 -->
+	<select id="getTableData" resultType="map" parameterType="map">
+        select * from ${tableName} b where b.business_no in ('${businessNos}')
+	</select>
+	
+	<!-- 查询sheet对应的表 -->
+	<select id="getSheetTableMeta" resultType="com.shuhao.clean.apps.meta.entity.UppMetadata" parameterType="map">
+		select a.*
+		  from upp_metadata u, upp_dic_fn_rela f, upp_metadata a
+		 where u.prt_metadata_id = #{excel_id} 
+		   and u.metadata_name = #{sheet_name}
+		   and u.metadata_id = f.metadata_id
+		   and f.db_obj_id = a.metadata_id
+	</select>
+	
+	<!-- 查询功能元数据 ,对应的是功能页面 PAG -->
+	<select id="getFunctionMeta" resultType="com.shuhao.clean.apps.meta.entity.UppMetadata" parameterType="map">
+	  select a.*
+	    from upp_metadata a
+	    left join upp_tmpl_page d
+	      on a.metadata_id = d.page_element_id
+	   where a.md_cate_cd = 'PAG'
+	     and d.tmpl_id = #{templateId}
+	     and d.is_curr_version = 'Y'
+	</select>
+	
+	<!-- 获取excel模版的sheet页 -->
+	<select id="getSheetXls" resultType="com.shuhao.clean.apps.meta.entity.UppMetadata" parameterType="map">
+		select * from upp_metadata u where u.prt_metadata_id = #{excel_id} and u.metadata_name = #{sheet_name}
+	</select>
+	
+	<!-- 按子模版id获取父表元数据 -->
+	<select id="getParentTableMeta" resultType="com.shuhao.clean.apps.meta.entity.UppMetadata" parameterType="map">
+	   select t.*
+	   from 
+	       upp_template a,
+	       upp_tmpl_page c, 
+	       upp_dic_fn_rela b, 
+	       upp_metadata t
+	    where 
+	        a.tmpl_id = #{templateId}
+	        and a.prt_tmpl_id = c.tmpl_id
+	        and c.is_curr_version = 'Y'
+			and c.page_element_id = b.metadata_id
+			and b.db_obj_id = t.metadata_id
+	</select>
+</mapper>

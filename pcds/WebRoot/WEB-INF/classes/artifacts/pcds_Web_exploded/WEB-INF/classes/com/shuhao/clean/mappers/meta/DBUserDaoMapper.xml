@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.shuhao.clean.apps.meta.dao.DBUserDao">
+	
+	
+	<!-- 添加数据库用户对象 -->
+	<insert id="addUser" parameterType="UppUser">
+		insert into upp_user (
+			user_id,
+			user_name,
+			user_password,
+			user_desc
+		) values (
+			#{user_id},
+			#{user_name},
+			#{user_password},
+			#{user_desc jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	
+	<!-- 根据id获取数据库用户对象 -->
+	<select id="getUserById" parameterType="string" resultType="UppUser">
+		select
+			a.user_id,
+			a.user_name,
+			a.user_password,
+			a.user_desc
+		from upp_user a
+		where a.user_id = #{user_id}
+	</select>
+	
+	
+	<!-- 保存数据库用户对象 -->
+	<update id="saveUser" parameterType="UppUser">
+		update 
+			upp_user a
+		set
+			a.user_name = #{user_name},
+			a.user_password = #{user_password},
+			a.user_desc = #{user_desc}
+		where a.user_id = #{user_id}
+	</update>
+	
+	<!-- 删除用户 -->
+	<delete id="deleteUser" parameterType="string">
+		delete from upp_user a where a.user_id = #{user_id}
+	</delete>
+	
+</mapper>

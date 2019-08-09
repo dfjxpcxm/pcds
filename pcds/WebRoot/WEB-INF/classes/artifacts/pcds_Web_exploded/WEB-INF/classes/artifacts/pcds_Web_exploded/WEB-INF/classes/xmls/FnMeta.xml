@@ -1,0 +1,502 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fnmetas>
+	<!-- 所有模版通用事件 ,每一个字段只能配置一个事件,优先查询 模版ID，name的事件，如果不存在，在查询通用的事件-->
+	<fnmeta pid="template*" name=""  desc="所有模版增加客户回显事件">
+		<field id="" name="cust_id" desc="客户号">
+			<event name="blur" param="t" exetype="ajax">
+				<initsql>
+					select cust_nm         as cust_name,
+					       cust_type_cd    as cust_cate_cd,
+					       country_cd      as country_cd,
+					       organization_cd as institution_cd,
+					       inner_rating_cd as inner_rating,
+					       outer_rating_cd as outer_rating,
+					       finance_license as finance_license
+					  from dw_cust
+					 where cust_id = '#id'
+				</initsql>
+				<!-- 属性待定 -->
+				<initcomps>
+					<comp name="cust_name" desc="客户名"></comp>
+					<comp name="cust_cate_cd" desc="客户类别"></comp>
+					<comp name="country_cd" desc="国别"></comp>
+					<comp name="institution_cd" desc="组织机构代码"></comp>
+					<comp name="inner_rating" desc="内部评级"></comp>
+					<comp name="outer_rating" desc="外部评级"></comp>
+					<comp name="finance_license" desc="金融许可证"></comp>
+				</initcomps>
+				<callback></callback>
+			</event>
+		</field>
+		<!-- 起息日,默认情况下 业务日期=起息日 -->
+		<field id="" name="int_start_date" desc="起息日">
+			<event name="change" param="t,n,o"  exetype="js">
+				<jscode>
+				var bizDate = dataForm .find('realName', 'biz_date');
+				if(bizDate){
+					bizDate[0].setValue(t.getRawValue());
+				}
+				var end = dataForm .find('realName', 'int_due_date');
+				if(end){
+					var target = dataForm.find('realName', 'term');
+					var endValue = end[0].getValue();
+					if(endValue &amp;&amp; t.getValue()){
+						var startValue = new Date(t.getValue());
+						var endValue = new Date(endValue);
+						var diffday = endValue - startValue;
+						if(diffday > 0){
+							if(target){
+								target[0].setValue(diffday.toFixed(2)/86400000);
+							}
+						}else{
+							Ext.Msg.alert('提示信息','到息日必须大于起息日。');
+						}
+					}else{
+						if(target){
+							target[0].setValue('');
+						}
+					}
+				}
+				</jscode>
+			</event>
+		</field>
+		<!-- 到息日 -->
+		<field id="" name="int_due_date" desc="到息日">
+			<event name="change" param="t,n,o"  exetype="js">
+				<jscode>
+				var start = dataForm .find('realName', 'int_start_date');
+				if(start){
+					var target = dataForm.find('realName', 'term');
+					var startValue = start[0].getValue();
+					if(startValue &amp;&amp; t.getValue()){
+						var startValue = new Date(startValue);
+						var endValue = new Date(t.getValue());
+						var diffday = endValue - startValue;
+						if(diffday>0){
+							if(target){
+								target[0].setValue(diffday.toFixed(2)/86400000);
+							}
+						}else{
+							Ext.Msg.alert('提示信息','到息日必须大于起息日。');
+						}
+					}else{
+						if(target){
+							target[0].setValue('');
+						}
+					}
+				}
+				</jscode>			
+			</event>
+		</field>
+		<!-- 保证金关联账号。金额 -->
+		<field id="" name="is_sec_money" desc="是否保证金">
+			<event name="select" param="c,r,i"  exetype="js">
+				<jscode>
+				var f1 = dataForm.find('realName','sec_money_acct');
+				var f2 = dataForm.find('realName','sec_money_amt');
+				if(c.getValue()=='Y'){
+					if(f1){
+						f1[0].setVisible(true);
+					}
+					if(f2){
+						f2[0].setVisible(true);
+					}
+				}else{
+					if(f1){
+						f1[0].setValue('');
+						f1[0].setVisible(false);
+					}
+					if(f2){
+						f2[0].setValue('');
+						f2[0].setVisible(false);
+					}
+				}
+				</jscode>			
+			</event>
+		</field>
+		<!-- 第三方是否兜底。金额 -->
+		<field id="" name="is_3rd_guarant" desc="第三方是否兜底">
+			<event name="valid" param="c,r,i"  exetype="js">
+				<jscode>
+				var f1 = dataForm.find('realName','guarant_amt');
+				if(c.getValue()=='Y'||c.getValue()=='是'){
+					if(f1){
+						f1[0].setVisible(true);
+					}
+				}else{
+					if(f1){
+						f1[0].setValue('');
+						f1[0].setVisible(false);
+					}
+				}
+				</jscode>			
+			</event>
+		</field>
+		<!-- 是否质押物 ,关联显示质押物类型
+		<field id="" name="is_pledge" desc="是否保证金">
+			<event name="select" param="c,r,i"  exetype="js">
+				<jscode>
+				var f0 = dataForm.find('realName','pledge_type_cd');
+																						
+				var f1 = dataForm.find('realName','deposit_rcpt_no');
+				var f2 = dataForm.find('realName','deposit_rcpt_amt');
+				var f3 = dataForm.find('realName','bond');
+				var f4 = dataForm.find('realName','equity_prod');
+				
+				if(c.getValue()=='Y'){
+					f0[0].setVisible(true);
+				}else{
+					for(var i=0;i &lt; 5;i++){
+						eval(\"if(f\"+i+\"){f\"+i+\"[0].setValue('');f\"+i+\"[0].setVisible(false);}\");
+					}
+				}
+				</jscode>			
+			</event>
+		</field>
+		-->
+		<!-- 是否质押物 ,关联显示质押物类型 -->
+		<field id="" name="is_pledge" desc="是否质押物 ">
+			<event name="valid" param="c,r,i"  exetype="js">
+				<jscode>
+				var f0 = dataForm.find('realName','pledge_type_cd');
+																						
+				var f1 = dataForm.find('realName','deposit_rcpt_no');
+				var f2 = dataForm.find('realName','deposit_rcpt_amt');
+				var f3 = dataForm.find('realName','bond');
+				var f4 = dataForm.find('realName','equity_prod');
+				
+				if(c.getValue()=='Y'||c.getValue()=='是'){
+					f0[0].setVisible(true);
+				}else{
+					if(f0){
+						f0[0].setValue('');
+						f0[0].setVisible(false);
+					}
+					if(f1){
+						f1[0].setValue('');
+						f1[0].setVisible(false);
+					}
+					if(f2){
+						f2[0].setValue('');
+						f2[0].setVisible(false);
+					}
+					if(f3){
+						f3[0].setValue('');
+						f3[0].setVisible(false);
+					}
+					if(f4){
+						f4[0].setValue('');
+						f4[0].setVisible(false);
+					}
+				}
+				</jscode>			
+			</event>
+		</field>
+		<!-- 质押物类型,关联存单账号，存单金额，债券，权益性产品  
+		<field id="" name="pledge_type_cd" desc="是否保证金">
+			<event name="select" param="c,r,i"  exetype="js">
+				<jscode>
+				var f1 = dataForm.find('realName','deposit_rcpt_no');
+				var f2 = dataForm.find('realName','deposit_rcpt_amt');
+				var f3 = dataForm.find('realName','bond');
+				var f4 = dataForm.find('realName','equity_prod');
+				
+				if(c.getRawValue()=='存款'){
+					f1[0].setVisible(true);
+					f2[0].setVisible(true);
+					if(f3){
+						f3[0].setVisible(false);
+						f3[0].setValue('');
+					}
+					if(f4){
+						f4[0].setVisible(false);
+						f4[0].setValue('');
+					}
+				}else if(c.getRawValue()=='债券'){
+					f1[0].setVisible(false);
+					f2[0].setVisible(false);
+					f1[0].setValue('');
+					f2[0].setValue('');
+					
+					f3[0].setVisible(true);
+					
+					f4[0].setVisible(false);
+					f4[0].setValue('');
+				}else if(c.getRawValue()=='权益性产品'){
+					f1[0].setVisible(false);
+					f2[0].setVisible(false);
+					f1[0].setValue('');
+					f2[0].setValue('');
+					
+					f3[0].setVisible(false);
+					f3[0].setValue('');
+					
+					f4[0].setVisible(true);
+				}
+				</jscode>
+			</event>
+		</field>
+		-->
+		<!-- 质押物类型,关联存单账号，存单金额，债券，权益性产品  -->
+		<field id="" name="pledge_type_cd" desc="是否保证金">
+			<event name="valid" param="c,r,i"  exetype="js">
+				<jscode>
+				var f1 = dataForm.find('realName','deposit_rcpt_no');
+				var f2 = dataForm.find('realName','deposit_rcpt_amt');
+				var f3 = dataForm.find('realName','bond');
+				var f4 = dataForm.find('realName','equity_prod');
+				
+				if(c.getValue()=='存款'||c.getValue()=='01'){
+					f1[0].setVisible(true);
+					f2[0].setVisible(true);
+					if(f3){
+						f3[0].setVisible(false);
+						f3[0].setValue('');
+					}
+					if(f4){
+						f4[0].setVisible(false);
+						f4[0].setValue('');
+					}
+				}else if(c.getValue()=='债券'||c.getValue()=='02'){
+					f1[0].setVisible(false);
+					f2[0].setVisible(false);
+					f1[0].setValue('');
+					f2[0].setValue('');
+					
+					f3[0].setVisible(true);
+					
+					f4[0].setVisible(false);
+					f4[0].setValue('');
+				}else if(c.getValue()=='权益性产品'||c.getValue()=='03'){
+					f1[0].setVisible(false);
+					f2[0].setVisible(false);
+					f1[0].setValue('');
+					f2[0].setValue('');
+					
+					f3[0].setVisible(false);
+					f3[0].setValue('');
+					
+					f4[0].setVisible(true);
+				}
+				</jscode>
+			</event>
+		</field>
+		
+		<!-- 是否配套同业存款。金额
+		<field id="" name="is_itr_bank_dpst" desc="是否配套同业存款">
+			<event name="select" param="c,r,i"  exetype="js">
+				<jscode>
+				var f1 = dataForm.find('realName','itr_bank_dpst_acct');
+				var f2 = dataForm.find('realName','itr_bank_dpst_amt');
+				if(c.getValue()=='Y'){
+					if(f1){
+						f1[0].setVisible(true);
+					}
+					if(f2){
+						f2[0].setVisible(true);
+					}
+				}else{
+					if(f1){
+						f1[0].setValue('');
+						f1[0].setVisible(false);
+					}
+					if(f2){
+						f2[0].setValue('');
+						f2[0].setVisible(false);
+					}
+				}
+				</jscode>			
+			</event>
+		</field>
+	 	-->
+		<!-- 是否配套同业存款。金额-->
+		<field id="" name="is_itr_bank_dpst" desc="是否配套同业存款">
+			<event name="valid" param="c,r,i"  exetype="js">
+				<jscode>
+				var f1 = dataForm.find('realName','itr_bank_dpst_acct');
+				var f2 = dataForm.find('realName','itr_bank_dpst_amt');
+				if(c.getValue()=='Y'||c.getValue()=='是'){
+					if(f1){
+						f1[0].setVisible(true);
+					}
+					if(f2){
+						f2[0].setVisible(true);
+					}
+				}else{
+					if(f1){
+						f1[0].setValue('');
+						f1[0].setVisible(false);
+					}
+					if(f2){
+						f2[0].setValue('');
+						f2[0].setVisible(false);
+					}
+				}
+				</jscode>			
+			</event>
+		</field>
+		<!--同业存放，存放同业， 付息频率,关联其他付息天数 -->
+		<field id="" name="int_pay_freq_cd" desc="付息频率">
+			<event name="select" param="c,r,i"  exetype="js">
+				<jscode>
+				var f1 = dataForm.find('realName','other_term_days');
+				if(c.getRawValue()=='其他'){
+					if(f1){
+						f1[0].setVisible(true);
+					}
+				}else{
+					if(f1){
+						f1[0].setValue('');
+						f1[0].setVisible(false);
+					}
+				}
+				</jscode>			
+			</event>
+		</field>
+		
+		<!-- 是否配套业务 账号 -->
+		<field id="" name="is_itr_biz" desc="是否配套业务">
+			<event name="valid" param="c,r,i"  exetype="js">
+				<jscode>
+				var f1 = dataForm.find('realName','itr_biz_acct');
+				if(c.getValue()=='Y'||c.getValue()=='是'){
+					if(f1){
+						f1[0].setVisible(true);
+					}
+				}else{
+					if(f1){
+						f1[0].setValue('');
+						f1[0].setVisible(false);
+					}
+				}
+				</jscode>			
+			</event>
+		</field>
+		
+		<!-- 定活类型  fc_type_cd , bug:未解决结束日期必输的表单设置 -->
+		<field id="" name="fc_type_cd" desc="定活类型">
+			<event name="valid" param="c,r,i"  exetype="js">
+				<jscode>
+				var f1 = dataForm.find('realName','int_due_date');
+				var f2 = dataForm.find('realName','term');
+				
+				if(c.getValue()=='活期'||c.getValue()=='01'){
+					if(f1){
+						f1[0].setVisible(false);
+						f1[0].setValue('');
+					}
+					if(f2){
+						f2[0].setVisible(false);
+						f2[0].setValue('');
+					}
+				}else if(c.getValue()=='定期'||c.getValue()=='02'){
+					if(f1){
+						f1[0].allowBlank = false;
+						f1[0].setVisible(true);
+					}
+					if(f2){
+						f1[0].allowBlank = true;
+						f2[0].setVisible(true);
+					}
+				} 
+				</jscode>
+			</event>
+		</field>
+	</fnmeta>
+	<!-- 按模版ID自定义事件 -->
+	<fnmeta pid="up201503201054010528" name=""  desc="委托贷款自定义事件">
+		<field id="" name="int_start_date" desc="起贷日">
+			<event name="change" param="t,n,o"  exetype="js">
+				<jscode>
+				var bizDate = dataForm .find('realName', 'biz_date');
+				if(bizDate){
+					bizDate[0].setValue(t.getRawValue());
+				}
+				var end = dataForm .find('realName', 'int_due_date');
+				if(end){
+					var target = dataForm.find('realName', 'term');
+					var endValue = end[0].getValue();
+					if(endValue &amp;&amp; t.getValue()){
+						var startValue = new Date(t.getValue());
+						var endValue = new Date(endValue);
+						var diffday = endValue - startValue;
+						if(diffday > 0){
+							if(target){
+								target[0].setValue(diffday.toFixed(2)/86400000);
+							}
+						}else{
+							Ext.Msg.alert('提示信息','到期日必须大于起贷日。');
+						}
+					}else{
+						if(target){
+							target[0].setValue('');
+						}
+					}
+				}
+				</jscode>
+			</event>
+		</field>
+		<!-- 到息日 -->
+		<field id="" name="int_due_date" desc="到期日">
+			<event name="change" param="t,n,o"  exetype="js">
+				<jscode>
+				var start = dataForm .find('realName', 'int_start_date');
+				if(start){
+					var target = dataForm.find('realName', 'term');
+					var startValue = start[0].getValue();
+					if(startValue &amp;&amp; t.getValue()){
+						var startValue = new Date(startValue);
+						var endValue = new Date(t.getValue());
+						var diffday = endValue - startValue;
+						if(diffday>0){
+							if(target){
+								target[0].setValue(diffday.toFixed(2)/86400000);
+							}
+						}else{
+							Ext.Msg.alert('提示信息','到期日必须大于起贷日。');
+						}
+					}else{
+						if(target){
+							target[0].setValue('');
+						}
+					}
+				}
+				</jscode>
+			</event>
+		</field>
+		<!-- 委托贷款还款方式 -->
+		<!-- <field id="" name="repayment_way_cd" desc="委托贷款">
+			<event name="select" param="c,r,i"  exetype="js">
+				<jscode>
+				var f1 = dataForm.find('realName','repayment_frequency');
+				var f2 = dataForm.find('realName','repayment_freq_unit');
+				
+				</jscode>			
+			</event>
+		</field> -->
+	</fnmeta>
+	
+	<!-- 按模版ID自定义事件 -->
+	<fnmeta pid="up201505161623160117" name=""  desc="存放同业V1自定义事件">
+		<field id="" name="trans_opponent" desc="交易对手">
+			<event name="select" param="c,r,i" exetype="js">
+				<jscode>
+					var f1 = dataForm.find('realName','cust_name');
+					if(f1){
+						f1[0].getStore().proxy = new Ext.data.HttpProxy({url:pathUrl + '/pageManager/getStore/up201505161623160117/cust_name'});
+						f1[0].getStore().reload({params:{value:c.getValue()},callback:function(r,o,s){
+							if(r.length==0){
+								f1[0].setValue('');
+								f1[0].setRawValue('');
+							}
+						}}); 
+					}
+				</jscode>
+			</event>
+		</field>
+		<!-- 数据源,用于个性化combo -->
+		<store id="" name="cust_name" desc="对手交易员">
+			<sql>select trader_id as name,trader_sn as label from dmd_organ_trader where organ_code='#id'</sql>
+		</store>
+	</fnmeta>
+</fnmetas>

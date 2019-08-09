@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.shuhao.clean.apps.meta.dao.ThemeClassDao">
+
+	<select id="findTheme" parameterType="string" resultType="UppTheme">
+		select * from upp_theme t where t.parent_theme_id=#{nodeId} order by t.display_order
+	</select>
+	
+	<insert id="addTheme" parameterType="UppTheme">
+		insert into upp_theme(theme_id,theme_name,theme_desc,parent_theme_id,status_code,is_display,display_order)
+		values(
+			#{theme_id},
+			#{theme_name},
+			#{theme_desc},
+			#{parent_theme_id},
+			#{status_code},
+			#{is_display},
+			#{display_order}
+		)
+	</insert>
+	
+	<delete id="removeTheme" parameterType="UppTheme">
+		delete from upp_theme a where a.theme_id=#{theme_id}
+	</delete>
+	
+	<update id="updateTheme" parameterType="UppTheme">
+		update upp_theme t
+		   set t.theme_desc    = #{theme_desc},
+		       t.theme_name    = #{theme_name},
+		       t.status_code   = #{status_code},
+		       t.is_display    = #{is_display},
+		       t.display_order = #{display_order}
+		 where t.theme_id = #{theme_id}
+	</update>
+	
+	<select id="getThemeById" parameterType="UppTheme" resultType="map">
+		select * from upp_theme t where t.theme_id=#{theme_id}
+	</select>
+	
+	<select id="getMetadataAsNode" parameterType="string" resultType="UppMetadata">
+		select * from upp_metadata t where t.parent_metadata_id=#{nodeId} order by t.display_order
+	</select>
+	
+	<select id="listAllMatadataCat" resultType="map">
+	<!-- 
+		select * from (
+			select '00' metadata_cate_code ,'模板' metadata_cate_name,1 display_order from dual
+			union all
+			select '10' metadata_cate_code ,'业务元数据' metadata_cate_name,2 display_order from dual
+			union all
+			select '20' metadata_cate_code ,'功能元数据' metadata_cate_name,3 display_order from dual
+			union all
+			select '1010' metadata_cate_code ,'主题' metadata_cate_name,4 display_order from dual
+			union all
+			select '101010' metadata_cate_code ,'表' metadata_cate_name,5 display_order from dual
+			union all
+			select '1010101' metadata_cate_code ,'字段' metadata_cate_name,6 display_order from dual
+			union all
+			select '2010' metadata_cate_code ,'功能页面' metadata_cate_name,7 display_order from dual
+			union all
+			select '201010' metadata_cate_code ,'工具条' metadata_cate_name,8 display_order from dual
+			union all
+			select '2010101' metadata_cate_code ,'显示字段' metadata_cate_name,9 display_order from dual
+		) order by display_order
+	 -->
+	 select * from upp_metadata_category
+	</select>
+</mapper>

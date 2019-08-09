@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 数据库元数据维护-->
+<mapper namespace="com.shuhao.clean.apps.meta.dao.UppDatabaseDao">
+	<!-- 获取数据库 -->
+	<select id="queryUppDatabaseList" parameterType="UppDatabase" resultType="UppDatabase"> 
+		select 
+			a.database_id, 
+			a.database_type_id, 
+			b.database_type_name,
+			a.database_name, 
+			a.database_desc, 
+			a.database_ip, 
+			a.conn_url, 
+			to_char(a.config_date,'yyyy/mm/dd')  config_date,
+			a.encoding, 
+			a.access_post, 
+			a.conn_type, 
+			a.username, 
+			a.password, 
+			a.is_display, 
+			a.display_order
+		from  upp_database a,upp_database_type b 
+		where 1=1
+			and a.database_type_id = b.database_type_id
+		<if test="database_id != null and database_id != ''">
+			and a.database_id = '${database_id}'
+		</if>
+		order by a.display_order asc
+		
+	</select>
+	
+	<!-- 新增=数据库-->
+	<insert id="addUppDatabase" parameterType="UppDatabase">
+		insert into 
+		upp_database 
+		(	
+			database_id, 
+			database_type_id, 
+			database_name, 
+			database_desc, 
+			database_ip, 
+			conn_url, 
+			config_date, 
+			encoding, 
+			access_post, 
+			conn_type, 
+			username, 
+			password, 
+			is_display, 
+			display_order
+		)
+		values 
+		(	
+			'${database_id}', 
+			'${database_type_id}', 
+			'${database_name}', 
+			'${database_desc}', 
+			'${database_ip}', 
+			'${conn_url}', 
+			now(), 
+			'${encoding}', 
+			'${access_post}', 
+			'${conn_type}', 
+			'${username}', 
+			'${password}', 
+			'${is_display}', 
+			'${display_order}'
+		)
+	</insert>
+	
+	<!-- 修改数据库元数据 -->
+	<update id="updateUppDatabase" parameterType="UppDatabase">
+		update  
+		upp_database 
+		set 
+			database_type_id  =			'${database_type_id}',                              
+			database_name     =			'${database_name}',                                 
+			database_desc     =			'${database_desc}',                                 
+			database_ip       =			'${database_ip}',                                   
+			conn_url          =			'${conn_url}',                                      
+			config_date       =			 now(), 
+			encoding          =			'${encoding}',                                      
+			access_post       =			'${access_post}',                                   
+			conn_type         =			'${conn_type}',                                     
+			username          =			'${username}',                                      
+			password          =			'${password}',                                      
+			is_display        =			'${is_display}',                                    
+			display_order     =			'${display_order}'                                  
+		where 1=1
+		and database_id = '${database_id}'
+	</update>
+	
+	<!-- 删除数据库元数据 -->
+	<delete id="deleteUppDatabase" parameterType="UppDatabase">
+		delete 
+		from   
+		upp_database 
+		where 1=1
+		and database_id = '${database_id}'
+	</delete>
+	
+	<!-- 获取表空间 -->
+	<select id="queryUppTablespaceList" parameterType="UppTablespace" resultType="UppTablespace"> 
+		select 
+			a.tablespace_id, 
+			a.database_id, 
+			a.tablespace_name, 
+			a.tablespace_desc, 
+			a.display_order, 
+			a.is_display
+		from  upp_tablespace a 
+		where 1=1
+		<if test="database_id != null and database_id != ''">
+			and a.database_id = '${database_id}'
+		</if>
+		<if test="tablespace_id != null and tablespace_id != ''">
+			and a.tablespace_id = '${tablespace_id}'
+		</if>
+		order by a.display_order asc
+	</select>
+	
+	<!-- 新增=表空间-->
+	<insert id="addUppTablespace" parameterType="UppTablespace">
+		insert into 
+		upp_tablespace
+		(	
+			tablespace_id, 
+			database_id, 
+			tablespace_name, 
+			tablespace_desc, 
+			display_order, 
+			is_display
+		)
+		values 
+		(	
+			'${tablespace_id}',
+			'${database_id}',
+			'${tablespace_name}',
+			'${tablespace_desc}',
+			'${display_order}',
+			'${is_display}'
+		)
+	</insert>
+	
+	<!-- 修改表空间元数据 -->
+	<update id="updateUppTablespace" parameterType="UppTablespace">
+		update  
+		upp_tablespace 
+		set 
+			tablespace_desc =  '${tablespace_desc}',
+			display_order   =  '${display_order}',
+			is_display      =  '${is_display}'
+		where 1=1
+		and tablespace_id = '${tablespace_id}'
+		
+	</update>
+	
+	<!-- 删除一个数据库下的表空间    -->
+	<delete id="deleteUppTablespaceByDbId" parameterType="string">
+		delete 
+		from   
+		upp_tablespace 
+		where 1=1
+			and database_id = #{database_id}
+	</delete>
+	
+	<!-- 删除一个表空间    -->
+	<delete id="deleteUppTablespace" parameterType="UppTablespace">
+		delete 
+		from   
+		upp_tablespace 
+		where 1=1
+			and tablespace_id = '${tablespace_id}'
+	</delete>
+	
+	
+	<!-- 获取用户 -->
+	<select id="queryUppDatabaseUserList" parameterType="UppDatabaseUser" resultType="UppDatabaseUser"> 
+		select 
+			db_user_id, 
+			database_id, 
+			owner_name, 
+			owner_desc, 
+			owner_password, 
+			default_tablespace_name, 
+			temp_tablespace_name, 
+			display_order, 
+			is_display
+		from  upp_database_user 
+		where 1=1 
+		<if test="db_user_id != null and db_user_id !=''">
+			and db_user_id = '${db_user_id}'
+		</if>
+		<if test="database_id != null and database_id != ''">
+			and database_id = '${database_id}'
+		</if>
+		order by display_order asc
+		
+	</select>
+	
+	<!-- 新增用户-->
+	<insert id="addUppDatabaseUser" parameterType="UppDatabaseUser">
+		insert into 
+		upp_database_user 
+		(	
+			db_user_id,
+			database_id, 
+			owner_name, 
+			owner_desc, 
+			owner_password, 
+			default_tablespace_name, 
+			temp_tablespace_name, 
+			display_order, 
+			is_display
+		)
+		values 
+		(	
+			#{db_user_id},
+			#{database_id},
+			#{owner_name},
+			#{owner_desc},
+			#{owner_password},
+			#{default_tablespace_name},
+			#{temp_tablespace_name},
+			#{display_order},
+			#{is_display}
+		)
+	</insert>
+	
+	<!-- 修改用户元数据 -->
+	<update id="updateUppDatabaseUser" parameterType="UppDatabaseUser">
+		update  
+		upp_database_user 
+		set 
+			owner_name              = #{owner_name},
+			owner_desc              = #{owner_desc},
+			display_order           = #{display_order},
+			is_display              = #{is_display}
+		where 1=1
+		and db_user_id = '${db_user_id}'
+	</update>
+	
+	<!-- 删除一个数据库下用户元数据 -->
+	<delete id="deleteUppDatabaseUserByDbId" parameterType="string">
+		delete 
+		from   
+		upp_database_user 
+		where 1=1 
+		and database_id = #{database_id}
+	</delete>
+	
+	<!-- 删除一个用户元数据 -->
+	<delete id="deleteUppDatabaseUser" parameterType="UppDatabaseUser">
+		delete 
+		from   
+		upp_database_user 
+		where 1=1
+		and db_user_id = '${db_user_id}'
+	</delete>
+	
+	<!-- 批量新增表空间 -->
+	<insert id="addBatchUppTablespace" parameterType="java.util.List">
+		insert into 
+		upp_tablespace
+		(	
+			tablespace_id, 
+			database_id, 
+			tablespace_name, 
+			tablespace_desc, 
+			display_order, 
+			is_display
+		)
+		select a.* from (  
+		<foreach collection="list" item="item" index="index" separator="union">  
+	    	select 
+	    		#{item.tablespace_id},
+	    		#{item.database_id},
+	    		#{item.tablespace_name},
+	    		#{item.tablespace_desc},
+	    		#{item.display_order},
+	    		#{item.is_display} 
+	    	from dual
+		</foreach>
+		) a
+	</insert>
+	
+	
+	<!-- 批量新增数据库用户-->
+	<insert id="addBatchUppDatabaseUser" parameterType="java.util.List">
+		insert into 
+		upp_database_user
+		(	
+			db_user_id, 
+			database_id, 
+			owner_name, 
+			owner_desc, 
+			display_order, 
+			is_display
+		)
+		select a.* from (  
+		<foreach collection="list" item="item" index="index" separator="union">  
+	    	select 
+	    		#{item.db_user_id}, 
+				#{item.database_id}, 
+				#{item.owner_name}, 
+				#{item.owner_desc}, 
+				#{item.display_order}, 
+				#{item.is_display}
+	    	from dual
+		</foreach>
+		) a
+	</insert>
+</mapper>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.shuhao.clean.apps.meta.dao.ExcelDao">
+	
+	<!-- 添加excel模板对象 -->
+	<insert id="addExcel" parameterType="UppExcel">
+		insert into upp_xls_book (
+			excel_id,
+			excel_tmpl_name
+		) values (
+			#{excel_id},
+			#{excel_tmpl_name}
+		)
+	</insert>
+	
+	
+	<!-- 根据id加载excel模板对象 -->
+	<select id="getExcelById" parameterType="string" resultType="UppExcel">
+		select 
+			a.excel_id,
+			a.excel_tmpl_name
+		from upp_xls_book a
+		where a.excel_id = #{excel_id}
+	</select>
+	
+	
+	<!-- 保存excel模板对象 -->
+	<update id="saveExcel" parameterType="UppExcel">
+		update 
+			upp_xls_book a
+		set
+			a.excel_tmpl_name = #{excel_tmpl_name}
+		where a.excel_id = #{excel_id}
+	</update>
+	
+	<!-- 删除标的列字段信息 -->
+	<delete id="deleteExcel" parameterType="string">
+		delete from upp_xls_book a where a.excel_id = #{excel_id}
+	</delete>
+	
+</mapper>

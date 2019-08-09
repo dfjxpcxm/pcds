@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration> 
+	<!-- 别名 -->
+	<typeAliases>
+		<!-- 机构 -->
+		<typeAlias alias="Bank" type="com.shuhao.clean.apps.base.entity.DmdBankInterOrg" />
+		<!-- 菜单 -->
+		<typeAlias alias="SysResourceInfo" type="com.shuhao.clean.apps.sys.entity.SysResourceInfo" />
+		<!-- 用户 -->
+		<typeAlias alias="SysUserInfo" type="com.shuhao.clean.apps.sys.entity.SysUserInfo" />
+		<!-- 角色 -->
+		<typeAlias alias="SysRoleInfo" type="com.shuhao.clean.apps.sys.entity.SysRoleInfo" />
+		<!-- 维表，对应 sys_dim_info -->
+		<typeAlias alias="DimTable" type="com.shuhao.clean.apps.sys.entity.DimTable" />
+		<!-- 指标 -->
+		<typeAlias alias="Measure" type="com.shuhao.clean.apps.sys.entity.Measure" />
+		<!-- 功能元数据属性 -->
+		<typeAlias alias="UppFnMetadataProperty" type="com.shuhao.clean.apps.meta.entity.UppFnMetadataProperty" />
+		
+		<!-- 主题 -->
+		<typeAlias alias="UppTheme" type="com.shuhao.clean.apps.meta.entity.UppTheme" />
+		<!-- 元数据 -->
+		<typeAlias alias="UppMetadata" type="com.shuhao.clean.apps.meta.entity.UppMetadata" />
+		
+		<!-- 元数据 -数据库 -->
+		<typeAlias alias="UppDatabase" type="com.shuhao.clean.apps.meta.entity.UppDatabase" />
+		
+		<!-- 元数据 -数据库 表空间 -->
+		<typeAlias alias="UppTablespace" type="com.shuhao.clean.apps.meta.entity.UppTablespace" />
+		
+		<!-- 元数据 -数据库  用户-->
+		<typeAlias alias="UppDatabaseUser" type="com.shuhao.clean.apps.meta.entity.UppDatabaseUser" />
+		
+		<!--校验规则库-->
+		<typeAlias alias="UppCheckRule" type="com.shuhao.clean.apps.validate.entity.UppCheckRule" />
+		<!--配置元数据校验规则-->
+		<typeAlias alias="MetadataCheckRule" type="com.shuhao.clean.apps.validate.entity.MetadataCheckRule" />
+		<!--页面事件-->
+		<typeAlias alias="PageEvent" type="com.shuhao.clean.apps.validate.entity.PageEvent" />
+
+		<!-- 元数据 -数据库  功能元数据与业务元数据关系-->
+		<typeAlias alias="UppDicFnRela" type="com.shuhao.clean.apps.meta.entity.UppDicFnRela" />
+		
+		<!-- 查询元数据 -->
+		<typeAlias alias="QueryDs" type="com.shuhao.clean.apps.query.entity.QueryDs" />
+		<!-- 根据元数据查询数据 -->
+		<typeAlias alias="QueryDsMeta" type="com.shuhao.clean.apps.query.entity.QueryDsMeta" />
+		<!-- 用户数据源元数据 -->
+		<typeAlias alias="UserQueryDsMeta" type="com.shuhao.clean.apps.query.entity.UserQueryDsMeta" />
+	</typeAliases>
+	
+	<mappers>
+		<mapper resource="mybatis/common-mapper.xml"/>
+	</mappers>
+
+ <!-- SQL语句拦截器
+ <plugins>
+ 	<plugin interceptor="com.rx.log.MyBatisInterceptor"></plugin>
+ </plugins>
+  -->
+</configuration>

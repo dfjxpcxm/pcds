@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shuhao.clean.apps.meta.dao.BckTrackingDao">
+	<!--获取模板结构树 -->
+	<select id="getTemplateTree" parameterType="map" resultType="map">
+		select t.tmpl_id,t.template_name from upp_template t where t.parent_template_id  = #{nodeId} and t.template_type_code = '02' and t.status_code = '02' 
+	</select>
+	
+	<select id="getTemplateById" parameterType="map" resultType="map">
+		select t.tmpl_id,t.template_name from upp_template t where t.tmpl_id  = #{templateId}
+	</select>
+	
+	<!-- 根据模板获取元数据 -->
+	<select id="getMetaByTemplateId" parameterType="map" resultType="map">
+		select a.metadata_id,a.component_type,a.col_biz_type_cd,a.component_id,a.component_tab,a.component_name,a.component_desc,a.min_value,a.max_value,a.min_length,a.max_length,
+       a.component_default,a.component_length,a.component_hide,a.component_query,a.dml_sql,a.dim_code,a.if_editable,a.if_must_input,a.if_pk,
+       b.column_code,b.column_label,b.dim_expr  from upp_fn_metadata_property a left join upp_dim_link b on a.dim_code = b.dim_code
+        where a.status_code = '02' and a.metadata_id in  (select t.metadata_id
+        from upp_tpml_fn_rela t  where t.tmpl_id = #{templateId}) order by a.display_order
+ 		
+	</select>
+	
+		<!-- 根据模板获取分类元素 -->
+	<select id="getMetaTypeByTemplateId" parameterType="map" resultType="map">
+        select b.col_biz_type_desc,a.col_biz_type_cd from upp_tmpl_col_biz_type a 
+				left join upp_col_biz_type b on a.col_biz_type_cd = b.col_biz_type_cd 
+				where a.tmpl_id = #{templateId} order by a.display_order 
+	</select>
+	
+	<!-- 根据模板获取查询菜单元素 -->
+	<select id="getMenuByTemplateId" parameterType="map" resultType="map">
+		select a.metadata_id,a.component_type,a.component_id,a.component_tab,a.component_name,a.component_desc,a.min_value,a.max_value,a.min_length,a.max_length,
+       a.component_default,a.component_length,a.component_hide,a.component_query,a.dml_sql,a.dim_code,a.if_editable,a.if_must_input,a.if_pk,
+       b.column_code,b.column_label,b.dim_expr  from upp_fn_metadata_property a left join upp_dim_link b on a.dim_code = b.dim_code
+        where a.status_code = '02' and a.metadata_id in  (select t.metadata_id from upp_tpml_fn_rela t  where t.tmpl_id = #{templateId}) 
+        and a.component_query = 'Y' and a.col_biz_type_cd is not null order by a.display_order
+	</select>
+	
+	<!-- 根据模板获取按钮元素 -->
+	<select id="getButtonByTemplateId" parameterType="map" resultType="map">
+        select a.metadata_id,a.component_type,a.component_tab,a.component_name,a.dml_sql 
+        from upp_fn_metadata_property a  where a.status_code = '02' and a.metadata_id in  (select t.metadata_id from upp_tpml_fn_rela t  
+         where t.tmpl_id = #{templateId})  and a.dml_sql is not null order by a.display_order
+	</select>
+	
+	<!-- 根据分类获取表单元素 -->
+	<select id="getMetaByTypeId" parameterType="map" resultType="map">
+		select a.metadata_id,a.component_type,a.component_id,a.component_tab,a.component_name,a.component_desc,a.min_value,a.max_value,a.min_length,a.max_length,
+       a.component_default,a.component_length,a.component_hide,a.component_query,a.dml_sql,a.dim_code,a.if_editable,a.if_must_input,a.if_pk,
+       b.column_code,b.column_label,b.dim_expr  from upp_fn_metadata_property a left join upp_dim_link b on a.dim_code = b.dim_code
+        where a.status_code = '02' and a.metadata_id in  (select t.metadata_id 
+        from upp_tpml_fn_rela t  where t.tmpl_id = #{templateId})  and a.col_biz_type_cd = #{col_biz_type_cd} order by a.display_order 
+	</select>
+	
+	<select id="getTabNameByTempId"  parameterType="map" resultType="string">
+		select a.table_name from upp_table a  inner join upp_tmpl_table_rela b on a.table_id = b.table_id  where b.tmpl_id = #{tmpl_id}
+	</select>
+	
+	<!-- 获取纬表的查询sql -->
+	<select id="getDimLinkSql" parameterType="map" resultType="string">
+		select t.dim_expr from upp_dim_link t where t.dim_code = #{dimcode}
+	</select>
+	
+	<select id="getDimLinkForTree" parameterType="map" resultType="map">
+		select t.* from upp_dim_source t where t.dim_cd = #{dimcode}
+	</select>
+	
+	<!-- 组装主界面查询列表sql -->
+	<select id="getMetaLinkJoinSql" parameterType="map" resultType="map">
+		select  a.metadata_name ,
+			    ' left join (' || c.dim_expr ||') xd' || rownum || ' on a.' || a.metadata_name || '=' ||
+			            'xd' || rownum || '.' || c.column_code  as  joinSql,
+			    'xd' || rownum || '.' || c.column_label || ' as ' || a.metadata_name as  joinCondition
+			from upp_fn_metadata_property a, upp_dim_link   c where a.metadata_id in (
+			    select metadata_id from upp_tpml_fn_rela b   where b.tmpl_id =#{templateId})
+			and a.dim_code = c.dim_code
+	</select>
+	
+	<!-- 模版元数据 -->
+	<sql id="templateRelyMeta">
+		select a.metadata_id,a.metadata_name,a.component_tab,a.component_type,a.dim_code,a.component_default ,a.display_order  from upp_fn_metadata_property a inner join 
+ 		upp_tpml_fn_rela b on a.metadata_id = b.metadata_id where b.tmpl_id = #{templateId} and a.component_type != 'hidden'
+ 		and a.metadata_id like 'cl%' order by a.col_biz_type_cd, a.display_order asc
+	</sql>
+	
+	<select id="getMetaInfoForExp" parameterType="map" resultType="map">
+		<include refid="templateRelyMeta"/>
+	</select>
+	
+	<!-- 按模版查询模版关联的元数据 -->
+	<select id="getTemplateMetaInfo" parameterType="string" resultType="map">
+		<include refid="templateRelyMeta"/>
+	</select>
+	
+	<!-- 获取模版的hidden字段 -->
+	<select id="getTemplateMetaHideInfo" parameterType="string" resultType="map">
+		select a.metadata_id,
+		       a.metadata_name,
+		       a.component_tab,
+		       a.dim_code,
+		       a.component_default,
+		       a.display_order
+		  from upp_fn_metadata_property a
+		 inner join upp_tpml_fn_rela b
+		    on a.metadata_id = b.metadata_id
+		 where b.tmpl_id = #{templateId}
+		   and a.component_type = 'hidden'
+		   and a.metadata_id like 'cl%'
+		 order by a.display_order asc
+	</select>
+	
+	<select id="getTmplMappingTab" parameterType="map" resultType="map">
+		select a.table_name from upp_table a inner join upp_tmpl_table_rela b   on a.table_id = b.table_id where b.tmpl_id = #{templateId}
+	</select>
+	
+</mapper>

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shuhao.clean.apps.query.dao.QueryDsMetaDao">
+
+	<select id="getDsMeta"  resultType="QueryDsMeta">
+		select 
+			ds_id,
+		    field_id,
+			field_label,
+			field_type,
+			is_dim,
+			dim_cd,
+			is_query,
+			link_type_cd,
+			is_hidden,
+			default_value,
+			display_order,
+			is_order
+		 from tool_cq_ds_meta 
+		where 1=1 and ds_id = #{ds_id}
+		order by display_order
+	</select>
+
+	<select id="getDimSource"  resultType="map">
+		select dim_cd,dim_name from  upp_dim_source 
+	</select>
+	
+	<!--  更新排序 -->
+	<update id="updateOrder" parameterType="map">
+		update tool_cq_ds_meta a
+		set a.display_order = #{display_order,jdbcType=VARCHAR}
+		where a.ds_id = #{ds_id,jdbcType=VARCHAR}
+		and a.field_id = #{field_id}
+	</update>
+	
+	<!-- 更新表格字段 -->
+	<update id="updateDsMeta" parameterType="QueryDsMeta">
+		update tool_cq_ds_meta 
+		set
+		field_label = #{field_label,jdbcType=VARCHAR},
+		field_type = #{field_type,jdbcType=VARCHAR},
+		is_dim = #{is_dim,jdbcType=CHAR},
+		dim_cd = #{dim_cd,jdbcType=VARCHAR},
+		is_query = #{is_query,jdbcType=CHAR},
+		link_type_cd = #{link_type_cd,jdbcType=VARCHAR},
+		is_hidden = #{is_hidden,jdbcType=CHAR},
+		default_value = #{default_value,jdbcType=VARCHAR},
+		display_order = #{display_order,jdbcType=INTEGER},
+		is_order = #{is_order,jdbcType=CHAR}
+		where ds_id = #{ds_id} and field_id =#{field_id}
+	</update>
+
+	<select id="findDsMetaById" parameterType="map" resultType="map">
+		select * from tool_cq_ds_meta t
+		where t.ds_id =#{ds_id} and t.field_id =#{field_id}
+	</select>
+	
+	<insert id="addDsAndMeta" parameterType="map">
+		insert into tool_cq_ds_meta(
+		    ds_id,
+		    field_id,
+			field_label,
+			field_type,
+			is_dim,
+			dim_cd,
+			is_query,
+			is_hidden,
+			default_value,
+			display_order,
+			is_order
+		) values(
+	        #{ds_id,jdbcType=VARCHAR},
+	        #{field_id,jdbcType=VARCHAR},
+			#{field_label,jdbcType=VARCHAR},
+			#{field_type,jdbcType=VARCHAR},
+			#{is_dim,jdbcType=CHAR},
+			#{dim_cd,jdbcType=VARCHAR},
+			#{is_query,jdbcType=CHAR},
+			#{is_hidden,jdbcType=CHAR},
+			#{default_value,jdbcType=VARCHAR},
+			#{display_order,jdbcType=INTEGER},
+			#{is_order,jdbcType=CHAR}
+		)
+	</insert>
+	
+	<update id="editDsAndMeta" parameterType="map">
+		update tool_cq_ds_meta 
+		set
+		field_label = #{field_label,jdbcType=VARCHAR},
+		field_type = #{field_type,jdbcType=VARCHAR},
+		is_dim = #{is_dim,jdbcType=CHAR},
+		dim_cd = #{dim_cd,jdbcType=VARCHAR},
+		is_query = #{is_query,jdbcType=CHAR},
+		is_hidden = #{is_hidden,jdbcType=CHAR},
+		default_value = #{default_value,jdbcType=VARCHAR},
+		display_order = #{display_order,jdbcType=INTEGER},
+		is_order = #{is_order,jdbcType=CHAR}
+		where ds_id = #{ds_id} and field_id =#{field_id}
+	</update>
+	
+	<delete id="deleteDsAndMeta" parameterType="map">
+		delete from tool_cq_ds_meta where ds_id = #{ds_id} and field_id =#{field_id}
+	</delete>
+	
+	<!-- 查询用户元数据列表 -->
+	<select id="getUserDsMeta" parameterType="map"  resultType="UserQueryDsMeta">
+		select 
+			a.ds_id,
+			a.field_id,
+			a.field_label,
+			a.field_type,
+			a.is_dim,
+			a.dim_cd,
+			case when b.is_query is not null then b.is_query else a.is_query end is_query,
+			case when b.link_type_cd is not null then b.link_type_cd else a.link_type_cd end link_type_cd,
+			case when b.is_hidden is not null then b.is_hidden else a.is_hidden end is_hidden,
+			case when b.default_value is not null then b.default_value else a.default_value end default_value,
+			case when b.is_order is not null then b.is_order else a.is_order end is_order,
+			case when b.display_order is not null then b.display_order else a.display_order end display_order 
+		from tool_cq_ds_meta a 
+			left join tool_cq_user_ds_cmeta b on a.ds_id = b.ds_id and a.field_id = b.field_id and b.user_id = #{userId}
+			where a.ds_id = #{dsId}
+			order by display_order
+	</select>
+
+	<!-- 添加用户元数据 -->
+	<insert id="addUserDsMeta" parameterType="UserQueryDsMeta">
+		insert into tool_cq_user_ds_cmeta(
+		    ds_id,
+		    field_id,
+		    user_id,
+			is_query,
+			link_type_cd,
+			is_hidden,
+			is_order,
+			default_value,
+			display_order
+		) values(
+	        #{ds_id,jdbcType=VARCHAR},
+	        #{field_id,jdbcType=VARCHAR},
+			#{user_id,jdbcType=VARCHAR},
+			#{is_query,jdbcType=CHAR},
+			#{link_type_cd,jdbcType=VARCHAR},
+			#{is_hidden,jdbcType=CHAR},
+			#{is_order,jdbcType=CHAR},
+			#{default_value,jdbcType=VARCHAR},
+			#{display_order,jdbcType=INTEGER}
+		)
+	</insert>
+	
+	<!-- 删除用户元数据 -->
+	<delete id="deleteUserDsMeta" parameterType="UserQueryDsMeta">
+		delete from tool_cq_user_ds_cmeta 
+		 where ds_id = #{ds_id,jdbcType=VARCHAR}
+		   and field_id =#{field_id,jdbcType=VARCHAR}
+		   and user_id = #{user_id,jdbcType=VARCHAR}
+	</delete>
+	
+	<!-- 添加批量用户元数据 -->
+	<insert id="addNewUserDsMetas" parameterType="map">
+		insert into tool_cq_user_ds_cmeta(
+		    ds_id,
+		    field_id,
+		    user_id,
+			is_query,
+			link_type_cd,
+			is_hidden,
+			is_order,
+			default_value,
+			display_order
+		 )
+		 select  ds_id,
+		    field_id,
+		    '${userId}',
+			is_query,
+			link_type_cd,
+			is_hidden,
+			is_order,
+			default_value,
+			display_order
+		 from tool_cq_ds_meta where field_id 
+		 not in(select field_id from tool_cq_user_ds_cmeta where ds_id=#{dsId} and user_id=#{userId})
+		 and ds_id =#{dsId}
+		 and field_id in ('${fieldIds}')
+	</insert>
+	
+	<!--  更新用户自定义排序 -->
+	<update id="updateUserDsMetaOrder" parameterType="map">
+		update tool_cq_user_ds_cmeta a
+		set a.display_order = #{displayOrder,jdbcType=VARCHAR}
+		where a.ds_id = #{dsId,jdbcType=VARCHAR}
+		and a.field_id = #{fieldId}
+		and a.user_id = #{userId}
+	</update>
+	
+</mapper>

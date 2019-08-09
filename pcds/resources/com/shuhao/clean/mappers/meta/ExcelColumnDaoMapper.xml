@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.shuhao.clean.apps.meta.dao.ExcelColumnDao">
+	
+	<resultMap id="columnMap" type="UppExcelColumn">
+		<id property="xls_col_id" column="xls_col_id"/>
+		<result property="xls_col_name" column="xls_col_name"/>
+		<result property="xls_col_label" column="xls_col_label"/>
+		<result property="formula_expr" column="formula_expr"/>
+		<result property="default_value" column="default_value"/>
+		<result property="display_order" column="display_order"/>
+		<result property="is_must_input" column="is_must_input"/>
+		<result property="dimSource.dim_cd" column="dim_cd"/>
+		<result property="dimSource.dim_name" column="dim_name"/>
+		<result property="tableColumn.column_id" column="column_id"/>
+		<result property="tableColumn.column_name" column="column_name"/>
+		<result property="tableColumn.column_desc" column="column_desc"/>
+		<result property="tableColumn.data_type_cd" column="data_type_cd"/>
+		<result property="tableColumn.data_length" column="data_length"/>
+		<result property="tableColumn.data_scale" column="data_scale"/>
+		<result property="tableColumn.is_pk" column="is_pk"/>
+		<result property="tableColumn.is_nullable" column="is_nullable"/>
+		<result property="tableColumn.obj_status_cd" column="obj_status_cd"/>
+			
+	</resultMap>
+	
+	<!-- 添加Excel列 -->
+	<insert id="addExcelColumn" parameterType="UppExcelColumn">
+		insert into upp_xls_column (
+			xls_col_id,
+			xls_col_name,
+			xls_col_label,
+			formula_expr,
+			display_order,
+			default_value,
+			dim_cd,
+			is_must_input
+		) values (
+			#{xls_col_id},
+			#{xls_col_name},
+			#{xls_col_label},
+			#{formula_expr jdbcType=VARCHAR},
+			#{display_order},
+			#{default_value jdbcType=VARCHAR},
+			#{dimSource.dim_cd jdbcType=VARCHAR},
+			#{is_must_input jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	
+	<!-- 根据id获取Excel列对象 -->
+	<select id="getExcelColumnById" parameterType="string" resultMap="columnMap">
+		select 
+			a.xls_col_id,
+			a.xls_col_name,
+			a.xls_col_label,
+			a.formula_expr,
+			a.display_order,
+			a.default_value,
+			a.dim_cd,
+			a.is_must_input,
+			d.dim_name,
+			c.column_id,
+			c.column_name,
+			c.column_desc,
+			c.data_type_cd,
+			c.data_length,
+			c.data_scale,
+			c.is_pk,
+			c.is_nullable,
+			c.obj_status_cd
+		from upp_xls_column a 
+			left join upp_dic_fn_rela b
+				on a.xls_col_id = b.metadata_id
+			left join upp_column c
+				on b.db_obj_id = c.column_id
+			left join upp_dim_source d
+				on a.dim_cd = d.dim_cd
+		where a.xls_col_id = #{column_id}
+	</select>
+	
+	
+	<!-- 保存Excel列对象 -->
+	<update id="saveExcelColumn" parameterType="UppExcelColumn">
+		update 
+			upp_xls_column a
+		set
+			a.xls_col_name = #{xls_col_name},
+			a.xls_col_label = #{xls_col_label},
+			a.formula_expr = #{formula_expr jdbcType=VARCHAR},
+			a.dim_cd = #{dimSource.dim_cd jdbcType=VARCHAR},
+			a.display_order = #{display_order},
+			a.is_must_input = #{is_must_input jdbcType=VARCHAR},
+			a.default_value = #{default_value jdbcType=VARCHAR}
+		where a.xls_col_id = #{xls_col_id}
+	</update>
+	
+	<!-- 删除Excel列对象 -->
+	<delete id="deleteExcelColumn" parameterType="string">
+		delete from upp_xls_column a where a.xls_col_id = #{column_id}
+	</delete>
+	
+	<!-- 根据sheet id查询Excel列列表 -->
+	<select id="queryExcelColumnBySheetId" parameterType="string" resultMap="columnMap">
+		select 
+			a.xls_col_id,
+			a.xls_col_name,
+			a.xls_col_label,
+			a.formula_expr,
+			a.display_order,
+			a.default_value,
+			a.dim_cd,
+			a.is_must_input,
+			e.dim_name,
+			d.column_id,
+			d.column_name,
+			d.column_desc,
+			d.data_type_cd,
+			d.data_length,
+			d.data_scale,
+			d.is_pk,
+			d.is_nullable,
+			d.obj_status_cd
+		from upp_metadata b, upp_xls_column a
+			left join upp_dic_fn_rela c
+				on a.xls_col_id = c.metadata_id
+			left join upp_column d
+				on c.db_obj_id = d.column_id
+			left join upp_dim_source e
+				on a.dim_cd = e.dim_cd
+		where a.xls_col_id = b.metadata_id
+			and b.prt_metadata_id = #{sheet_id}
+		order by a.display_order
+	</select>
+	
+	<!--  更新排序 -->
+	<update id="updateDisOrder" parameterType="map">
+		update upp_xls_column a
+		set a.display_order = #{display_order,jdbcType=VARCHAR}
+		where a.xls_col_id = #{field_id,jdbcType=VARCHAR}
+	</update>
+	
+	<!-- 保存元数据信息 -->
+	<update id="saveMetadata" parameterType="map">
+		update 
+			upp_metadata a
+		set
+			a.update_user_id = #{user_id},
+			a.display_order = #{display_order},
+			a.update_time = now()
+		where a.metadata_id = #{metadata_id}
+	</update>
+	
+</mapper>

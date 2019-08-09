@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.shuhao.clean.apps.validate.dao.CheckRuleDao">
+	
+	<insert id="addCheckRule" parameterType="UppCheckRule">
+		insert into upp_chk_rule
+		(
+			chk_rule_cd,
+			chk_rule_name,
+			chk_rule_desc,
+			chk_type_cd,
+			chk_method_cd,
+			rule_type_flag,
+			chk_formula,
+			chk_formula_desc,
+			chk_priority,
+			status_cd,
+			create_user_id,
+			create_time,
+			update_user_id,
+			update_time,
+			display_order,
+			chk_failure_tip
+		)
+		values(
+			#{chk_rule_code,jdbcType=VARCHAR},
+			#{chk_rule_name,jdbcType=VARCHAR},
+			#{chk_rule_desc,jdbcType=VARCHAR},
+			#{chk_type_code,jdbcType=VARCHAR},
+			#{chk_method_code,jdbcType=VARCHAR},
+			#{rule_type_flag,jdbcType=VARCHAR},
+			#{chk_formula,jdbcType=VARCHAR},
+			#{chk_formula_desc,jdbcType=VARCHAR},
+			#{chk_priority,jdbcType=INTEGER},
+			#{status_code,jdbcType=VARCHAR},
+			#{create_user_id,jdbcType=VARCHAR},
+			now(),
+			null,
+			null,
+			#{display_order,jdbcType=INTEGER},
+			#{chk_failure_tip,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<insert id="addMetaRule" parameterType="MetadataCheckRule">
+		insert into upp_chk_metadata_rule
+		(
+			metadata_id,
+			chk_rule_cd,
+			chk_formula,
+			chk_formula_desc,
+			chk_priority,
+			chk_failure_tip,
+			chk_action
+		)
+		values(
+			#{metadata_id,jdbcType=VARCHAR},
+			#{chk_rule_code,jdbcType=VARCHAR},
+			#{chk_formula,jdbcType=VARCHAR},
+			#{chk_formula_desc,jdbcType=VARCHAR},
+			#{chk_priority,jdbcType=INTEGER},
+			#{chk_failure_tip,jdbcType=VARCHAR},
+			#{chk_action,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<delete id="deleteCheckRule" parameterType="UppCheckRule">
+		 delete from upp_chk_rule t where t.chk_rule_cd=#{chk_rule_code}
+	</delete>
+	
+	<delete id="deleteMetaRule" parameterType="UppCheckRule">
+		 delete from upp_chk_metadata_rule t where t.metadata_id=#{metadata_id} and t.chk_rule_cd = #{chk_rule_code}
+	</delete>
+	
+	<update id="updateCheckRule" parameterType="UppCheckRule">
+		update upp_chk_rule
+		   set 
+		       chk_rule_name    = #{chk_rule_name,jdbcType=VARCHAR},
+		       chk_rule_desc = #{chk_rule_desc,jdbcType=VARCHAR},
+		       chk_type_cd = #{chk_type_code,jdbcType=VARCHAR},
+		       chk_method_cd = #{chk_method_code,jdbcType=VARCHAR},
+		       rule_type_flag = #{rule_type_flag,jdbcType=VARCHAR},
+		       chk_formula = #{chk_formula,jdbcType=VARCHAR},
+		       chk_formula_desc = #{chk_formula_desc,jdbcType=VARCHAR},
+		       chk_priority = #{chk_priority,jdbcType=INTEGER},
+		       status_cd = #{status_code,jdbcType=VARCHAR},
+		       update_user_id = #{update_user_id,jdbcType=VARCHAR},
+		       update_time = now(),
+		       display_order = #{display_order,jdbcType=INTEGER},
+		       chk_failure_tip = #{chk_failure_tip,jdbcType=VARCHAR}
+		 where chk_rule_cd = #{chk_rule_code,jdbcType=VARCHAR}
+	</update>
+	
+	<update id="updateMetaRule" parameterType="MetadataCheckRule">
+		update upp_chk_metadata_rule
+		   set chk_rule_cd  = #{chk_rule_code,jdbcType=VARCHAR},
+		       chk_formula  = #{chk_formula,jdbcType=VARCHAR},
+		       chk_formula_desc = #{chk_formula_desc,jdbcType=VARCHAR},
+		       chk_priority = #{chk_priority,jdbcType=INTEGER},
+		       chk_failure_tip = #{chk_failure_tip,jdbcType=VARCHAR},
+		       chk_action = #{chk_action,jdbcType=VARCHAR}
+		 where metadata_id = #{metadata_id,jdbcType=VARCHAR} 
+		 and chk_rule_cd = #{old_chk_rule_code,jdbcType=VARCHAR}
+	</update>
+	
+	
+	<!-- 查询未配置的校验规则sql -->
+	<sql id="listCheckRuleSql">
+	    select 
+	       a.chk_rule_cd chk_rule_code,
+	       a.chk_rule_name,
+	       a.chk_rule_desc,
+	       a.chk_type_cd chk_type_code,
+	       b.chk_type_desc,
+	       a.chk_method_cd chk_method_code,
+	       c.chk_method_name,
+	       a.rule_type_flag,
+	       a.chk_formula,
+	       a.chk_formula_desc,
+	       a.chk_priority,
+	       a.status_cd status_code,
+	       a.create_user_id,
+	       a.create_time,
+	       a.update_user_id,
+	       a.update_time,
+	       a.display_order,
+	       a.chk_failure_tip
+	     from upp_chk_rule a 
+	     left join upp_chk_type b on a.chk_type_cd=b.chk_type_cd
+	     left join upp_chk_method c on c.chk_method_cd = a.chk_method_cd
+	      where a.status_cd = '02' 
+	      and not exists  (
+	      		select '' from  upp_chk_metadata_rule d  
+	      			where d.chk_rule_cd =a.chk_rule_cd and d.metadata_id=#{metadata_id}
+	      	)
+		<if test="searchKey !=null and searchKey !=''">
+			and (upper(a.chk_rule_cd) like upper('%${searchKey}%') or upper(a.chk_rule_name) like upper('%${searchKey}%'))
+		</if>
+		<if test="chk_rule_code !=null and chk_rule_code !=''">
+			and a.chk_rule_cd=#{chk_rule_code}
+		</if>
+		<if test="chk_type_code !=null ">
+			and a.chk_type_cd=#{chk_type_code}
+		</if>
+		<if test="chk_method_code !=null ">
+			and a.chk_method_cd=#{chk_method_code}
+		</if>
+		order by a.display_order,a.chk_priority
+	</sql>
+	<!-- 查询未配置的校验规则 -->
+	<select id="listCheckRulePage" parameterType="map" resultType="UppCheckRule">
+		<include refid="common.pagingHead"/>
+		<include refid="listCheckRuleSql"/>
+		<include refid="common.pagingEnd"/>
+	</select>
+	<!-- 查询未配置的校验规则-->
+	<select id="listCheckRuleTotal" parameterType="map" resultType="int">
+		<include refid="common.totalCountHead"/>
+		<include refid="listCheckRuleSql"/>
+		<include refid="common.totalCountEnd"/>
+	</select>
+	
+	
+	<!-- 查询元数据配置校验规则sql -->
+	<sql id="listMetadataCheckRuleSql">
+		select 
+		b.chk_rule_cd as chk_rule_code,
+		b.chk_rule_name,
+		b.chk_rule_desc,
+		b.chk_type_cd as chk_type_code,
+		c.chk_type_desc,
+		b.chk_method_cd as chk_method_code,
+		d.chk_method_name,
+		b.rule_type_flag,
+		<!-- decode(b.rule_type_flag,'0',b.chk_formula,'1',a.chk_formula) chk_formula, 
+		decode(b.rule_type_flag,'0',b.chk_formula_desc,'1',a.chk_formula_desc) chk_formula_desc,
+		decode(b.rule_type_flag,'0',b.chk_priority,'1',a.chk_priority) chk_priority,
+		decode(b.rule_type_flag,'0',b.chk_failure_tip,'1',a.chk_failure_tip) chk_failure_tip, -->
+		if(b.rule_type_flag='0',b.chk_formula,a.chk_formula)as  chk_formula, 
+		if(b.rule_type_flag='0',b.chk_formula_desc,a.chk_formula_desc)as  chk_formula_desc,
+		if(b.rule_type_flag='0',b.chk_priority,a.chk_priority)as  chk_priority,
+		if(b.rule_type_flag='0',b.chk_failure_tip,a.chk_failure_tip)as chk_failure_tip,
+		b.status_cd,
+		e.status_name,
+		a.chk_action
+		from upp_chk_metadata_rule a 
+		left join upp_chk_rule  b on a.chk_rule_cd=b.chk_rule_cd
+		left join upp_chk_type c on c.chk_type_cd=b.chk_type_cd
+		left join upp_chk_method d on d.chk_method_cd = b.chk_method_cd
+		left join upp_status e on e.status_cd = b.status_cd
+	    where 1=1 
+		<if test="metadata_id !=null and metadata_id !=''">
+			and a.metadata_id=#{metadata_id}
+		</if>
+		<!-- order by decode(b.rule_type_flag,'0',b.chk_priority,'1',a.chk_priority) -->
+		order by if(b.rule_type_flag='0',b.chk_priority,a.chk_priority)
+	</sql>
+	<!-- 查询元数据配置校验规则 分页 -->
+	<select id="listMetadataCheckRulePage" parameterType="map" resultType="UppCheckRule">
+		<include refid="common.pagingHead"/>
+		<include refid="listMetadataCheckRuleSql"/>
+		<include refid="common.pagingEnd"/>
+	</select>
+	<!-- 查询元数据配置校验规则 总数 -->
+	<select id="listMetadataCheckRuleTotal" parameterType="map" resultType="int">
+		<include refid="common.totalCountHead"/>
+		<include refid="listMetadataCheckRuleSql"/>
+		<include refid="common.totalCountEnd"/>
+	</select>
+	
+	<!-- 查询校验类型 -->
+	<select id="listCheckType" parameterType="map" resultType="map">
+		select * from upp_chk_type
+	</select>
+	<!-- 查询元数据 -->
+	<select id="getMetadata" parameterType="map" resultType="map">
+		select * from upp_metadata where metadata_id= #{metadata_id}
+	</select>
+	<!-- 查询表字段-->
+	<select id="listColumns" parameterType="map" resultType="map">
+		select * from upp_metadata t where t.prt_metadata_id = #{metadata_id}
+	</select>
+	
+	<!-- 查询页面字段列表 -->
+	<select id="listPageFields" parameterType="map" resultType="map">
+		select a.* from 
+	       upp_metadata a,
+	       upp_metadata u
+	    where 
+	     a.prt_metadata_id = u.metadata_id
+	     and u.prt_metadata_id = #{metadata_id} and  u.md_cate_cd = 'FDL'
+	</select>
+	
+	<!-- 查询目标表,分类 TAB-->
+	<select id="listTargetTab" parameterType="map" resultType="map">
+		select * from upp_metadata t where t.md_cate_cd = 'TAB'
+	</select>
+	
+	<!-- 查询校验方法-->
+	<select id="listCheckMethod" parameterType="map" resultType="map">
+		select * from upp_chk_method 
+	</select>
+	
+	<!-- 查询校验规则库sql -->
+	<sql id="listCheckRuleLibSql">
+	       select a.chk_rule_cd as chk_rule_code,
+		       a.chk_rule_name,
+		       a.chk_rule_desc,
+		       a.chk_type_cd as chk_type_code,
+		       b.chk_type_desc,
+		       a.chk_method_cd as chk_method_code,
+		       c.chk_method_name,
+		       a.rule_type_flag,
+		       a.chk_formula,
+		       a.chk_formula_desc,
+		       a.chk_priority,
+		       a.status_cd as status_code,
+		       d.status_name,
+		       a.create_user_id,
+		       a.create_time,
+		       a.update_user_id,
+		       a.update_time,
+		       a.display_order,
+		       chk_failure_tip
+		  from upp_chk_rule  a
+		  left join upp_chk_type b
+		    on a.chk_type_cd = b.chk_type_cd
+		  left join upp_chk_method c
+		    on c.chk_method_cd = a.chk_method_cd
+		  left join upp_status d
+		    on d.status_cd = a.status_cd
+		 where 1 = 1
+		<if test="searchKey !=null and searchKey !=''">
+			and (upper(a.chk_rule_name) like upper('%${searchKey}%'))
+		</if>
+		<if test="chk_rule_code !=null and chk_rule_code !=''">
+			and a.chk_rule_cd=#{chk_rule_code}
+		</if>
+		<if test="chk_type_code !=null ">
+			and a.chk_type_cd=#{chk_type_code}
+		</if>
+		<if test="chk_method_code !=null ">
+			and a.chk_method_cd=#{chk_method_code}
+		</if>
+		order by a.display_order,a.chk_priority
+	</sql>
+	
+	<!-- 查询校验规则库 -->
+	<select id="listCheckRuleLibPage" parameterType="map" resultType="UppCheckRule">
+		<include refid="common.pagingHead"/>
+		<include refid="listCheckRuleLibSql"/>
+		<include refid="common.pagingEnd"/>
+	</select>
+	<!-- 查询校验规则库-->
+	<select id="listCheckRuleLibTotal" parameterType="map" resultType="int">
+		<include refid="common.totalCountHead"/>
+		<include refid="listCheckRuleLibSql"/>
+		<include refid="common.totalCountEnd"/>
+	</select>
+</mapper>

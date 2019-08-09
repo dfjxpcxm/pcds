@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ssh2>
+	<ipAddr>192.168.1.118</ipAddr>
+	<userName>root</userName>
+	<password>oracle</password>
+	<charset>UTF-8</charset>
+	<cmds>
+		<cmd>sh /root/shl/test.sh</cmd>
+	</cmds>
+</ssh2>

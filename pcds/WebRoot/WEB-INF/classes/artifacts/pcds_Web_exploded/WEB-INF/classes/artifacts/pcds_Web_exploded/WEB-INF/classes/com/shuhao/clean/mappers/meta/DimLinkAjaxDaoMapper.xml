@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 业务类型期限管理 -->
+<mapper namespace="com.shuhao.clean.apps.meta.dao.DimLinkAjaxDao">
+	 
+	 <!-- 查询维度 -->
+	<sql id="listDimLinksSql">
+		select * from upp_dim_source where 1=1
+		<if test="searchKey !=null and searchKey !=''">
+			and (upper(dim_cd) like upper('%${searchKey}%') or upper(dim_name) like upper('%${searchKey}%'))
+		</if>
+		<if test="dim_cd !=null and dim_cd !=''">
+			and dim_cd=#{dim_cd}
+		</if>
+	</sql>
+	<!-- 查询维度 分页 -->
+	<select id="listDimLinksPage" parameterType="map" resultType="map">
+		<include refid="common.pagingHead"/>
+		<include refid="listDimLinksSql"/>
+		<include refid="common.pagingEnd"/>
+	</select>
+	<!-- 查询维度 总数 -->
+	<select id="listDimLinksTotal" parameterType="map" resultType="int">
+		<include refid="common.totalCountHead"/>
+		<include refid="listDimLinksSql"/>
+		<include refid="common.totalCountEnd"/>
+		
+	</select>
+	
+	<insert id="addDimLink" parameterType="map" >
+		insert into upp_dim_source (
+			DIM_CD,DIM_NAME,DIM_DESC,DIM_SQL_EXPR,IS_TREE,CODE_COL_NAME,
+			LABEL_COL_NAME,PRT_COL_NAME,ROOT_VALUE,CASCADE_SQL_EXPR,
+			IS_TABLE_EDIT,TABLE_NAME,TABKE_PK,TABLE_COLS
+		)
+		values (
+			#{dim_cd,jdbcType=VARCHAR},
+			#{dim_name,jdbcType=VARCHAR},
+			#{dim_desc,jdbcType=VARCHAR},
+			#{dim_sql_expr,jdbcType=VARCHAR},
+			#{is_tree,jdbcType=VARCHAR},
+			#{code_col_name,jdbcType=VARCHAR},
+			#{label_col_name,jdbcType=VARCHAR},
+			#{prt_col_name,jdbcType=VARCHAR},
+			#{root_value,jdbcType=VARCHAR},
+			#{cascade_sql_expr,jdbcType=VARCHAR},
+			#{is_table_edit,jdbcType=VARCHAR},
+			#{table_name,jdbcType=VARCHAR},
+			#{tabke_pk,jdbcType=VARCHAR},
+			#{table_cols,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	
+	<update id="editDimLink" parameterType="map" >
+		update upp_dim_source set 
+			DIM_NAME=#{dim_name},
+			DIM_DESC=#{dim_desc},
+			DIM_SQL_EXPR=#{dim_sql_expr},
+			IS_TREE=#{is_tree},
+			CODE_COL_NAME=#{code_col_name},
+			LABEL_COL_NAME=#{label_col_name},
+			PRT_COL_NAME=#{prt_col_name},
+			ROOT_VALUE=#{root_value},
+			CASCADE_SQL_EXPR=#{cascade_sql_expr},
+			IS_TABLE_EDIT=#{is_table_edit},
+			TABLE_NAME=#{table_name},
+			TABKE_PK=#{tabke_pk},
+			TABLE_COLS=#{table_cols}
+		where DIM_CD = #{dim_cd}
+	</update>
+	
+	<delete id="deleteDimLink" parameterType="map" >
+		delete from  upp_dim_source 
+		where DIM_CD = #{dim_cd}
+	</delete>
+	
+	<select id="queryForList" parameterType="map" resultType="map">
+		${sql}
+	</select>
+	
+</mapper>

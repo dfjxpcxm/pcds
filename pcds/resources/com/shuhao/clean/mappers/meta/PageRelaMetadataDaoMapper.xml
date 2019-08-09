@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.shuhao.clean.apps.meta.dao.PageRelaMetadataDao">
+	
+	<!-- 查询关联元数据-->
+	<select id="queryRelaMetadata" parameterType="map" resultType="map">
+		select 
+			a.metadata_id rela_metadata_id,
+			a.metadata_name||'['||a.metadata_desc||']' rela_metadata_name
+		from upp_metadata a
+		where a.md_cate_cd = #{md_cate_cd,jdbcType=VARCHAR}
+		  and a.prt_metadata_id = #{prt_metadata_id,jdbcType=VARCHAR}
+	</select>
+	
+	<!-- 增加数据字典与功能映射关系 -->
+	<insert id="addDicFnRela" parameterType="UppDicFnRela">
+		insert into 
+		upp_dic_fn_rela(
+			metadata_id,
+			db_obj_id
+		)values( 
+			#{metadata_id,jdbcType=VARCHAR}, 
+			#{db_obj_id,jdbcType=VARCHAR} 
+		)
+	</insert>
+	
+	<!-- 查询关联映射数据字典-->
+	<select id="queryRelaDicData" parameterType="map" resultType="map">
+		select 
+			a.metadata_id ,
+			a.db_obj_id
+		from upp_dic_fn_rela a
+		where   a.metadata_id = #{metadata_id,jdbcType=VARCHAR}
+	</select>
+	
+	<!-- 删除数据字典与功能映射关系 -->
+	<delete id="deleteDicFnRela" parameterType="UppDicFnRela">
+		delete from upp_dic_fn_rela  
+		where 1=1
+		<if test="metadata_id != null and metadata_id != ''">
+		  and metadata_id=#{metadata_id,jdbcType=VARCHAR}
+		</if>
+		<if test="metadata_id == null or metadata_id == ''">
+	      and db_obj_id=#{db_obj_id,jdbcType=VARCHAR}
+		</if>  
+	</delete>
+	
+	<!-- 根据关联表ID和页面ID获取增量字段列表-->
+	<select id="getNoRelaTableColumns" parameterType="map" resultType="UppTableColumn">
+		select a.column_id,
+		       a.column_name,
+		       a.column_desc,
+		       a.data_type_cd,
+		       a.data_length,
+		       a.data_scale,
+		       a.is_pk,
+		       a.is_nullable,
+		       a.obj_status_cd
+		  from upp_column a
+		 where 1 = 1
+		   and a.column_id in (select b.metadata_id
+		                         from upp_metadata b
+		                        where b.prt_metadata_id = #{rela_table_id}
+		                          and b.metadata_id not in
+		                              (select c.db_obj_id
+		                                 from upp_dic_fn_rela c
+		                                where c.metadata_id in
+		                                      (select d.metadata_id
+		                                         from upp_metadata d
+		                                        where d.prt_metadata_id =#{field_list_id} )))
+	</select>
+	
+</mapper>

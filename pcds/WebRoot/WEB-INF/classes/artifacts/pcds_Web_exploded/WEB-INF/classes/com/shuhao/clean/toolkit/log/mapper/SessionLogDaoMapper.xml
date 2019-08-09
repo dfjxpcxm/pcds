@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shuhao.clean.toolkit.log.dao.SessionLogWriterDao">
+	<!--
+		SQL功能描述: 更新session登出时间 ;
+		参数描述: sessionId: 更新记录的sessionId;
+	-->
+	<update id="writeLogOut" parameterType="string">
+		update
+			opm_sys_login_his
+		set 
+			end_time=now()
+		where
+			session_id=#{sessionId}  
+	 </update>
+	<!--
+		SQL功能描述: 更新session超时销毁时间 
+		参数描述: 
+		sessionId: 更新记录的sessionId
+		sessionInvalidTime: session自动销毁时间[分钟] 
+	-->
+	<update id="sessionDestroyLog" parameterType="Map">
+		update 
+			opm_sys_login_his 
+		set
+			end_time=now()-#{sessionInvalidTime}/60/24,
+		where 
+			session_id=#{sessionId} 
+	 </update>
+	<!--
+		SQL功能描述: 记录用户登录日志
+		参数描述: 
+		sessionId: 更新记录的sessionId
+		user_id: 登录用户id
+		owner_id: 登录用户使用的权限机构号
+		loginIP: 登录用户ip 
+	-->
+	<insert id="addSessionLog" parameterType="map">
+		insert into opm_sys_login_his(session_id,user_id,login_ip,begin_time,end_time)
+		values(#{sessionId},#{user_id},#{loginIP},now(),trunc(now(),'dd')+86399/86400)
+	</insert>
+	<!-- 
+		SQL功能描述: 记录用户操作方法日志
+		参数描述: 
+		sessionId: 更新记录的sessionId
+		functionCode: 操作方法的ID
+	 -->
+	 <insert id="addFunctionLog" parameterType="map">
+	 	insert into opm_sys_oper_his(session_id,oper_time,function_id) values(#{sessionId},now(),#{functionCode})
+	 </insert>
+</mapper>

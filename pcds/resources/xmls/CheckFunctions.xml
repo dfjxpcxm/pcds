@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<functions>
+	<!-- 内置函数 -->
+	<group type="common">
+		<!-- 执行方式 ：java -->
+		<exeMethod type="java">
+			<function >
+				<name>日期转换为字符串</name>
+				<content><![CDATA[date_to_string(date,'%Y-%m-%d')]]></content>
+				<desc>将 Date 对象转化化特定格式的字符串</desc>
+			</function>
+			<function >
+				<name>字符串转换为日期</name>
+				<content><![CDATA[string_to_date(source,'%Y-%m-%d')]]></content>
+				<desc>将特定格式的字符串转化为 Date 对象</desc>
+			</function>
+			<function >
+				<name>计算字符串长度</name>
+				<content><![CDATA[string.length(s)]]></content>
+				<desc>求字符串长度,返回 Long</desc>
+			</function>
+			<function >
+				<name>字符串截取</name>
+				<content><![CDATA[string.substring(s,begin,end)]]></content>
+				<desc>截取字符串 s，从 begin 到 end，end（可选） 如果忽略的话，将从 begin 到结尾</desc>
+			</function>
+			<function >
+				<name>查找字符串索引</name>
+				<content><![CDATA[string.indexOf(s1,s2)]]></content>
+				<desc>java 中的 s1.indexOf(s2)，求 s2 在 s1 中的起始索引位置，如果不存在为-1</desc>
+			</function>
+			<function >
+			    <name>集合连接为字符串</name>
+				<content><![CDATA[string.join(seq,seperator)]]></content>
+				<desc>将集合 seq 里的元素以 seperator 为间隔连接起来形成字符串 </desc>
+			</function>
+			<function >
+			    <name>求绝对值</name>
+				<content><![CDATA[math.abs(d)]]></content>
+				<desc>求 d 的绝对值</desc>
+			</function>
+			<function >
+			    <name>三位运算</name>
+				<content><![CDATA[expr ? subExpr1 : subExpr2]]></content>
+				<desc>expr返回结果，如果为true执行子表达式1，false执行子表达式2</desc>
+			</function>
+		</exeMethod>
+		<!-- 执行方式 ：sql -->
+		<exeMethod type="sql">
+			<function >
+			    <name>求和</name>
+				<content><![CDATA[sum(col)]]></content>
+				<desc>对col字段求和</desc>
+			</function>
+			<function >
+			    <name>截取字符串</name>
+				<content><![CDATA[substr(string,start,count)]]></content>
+				<desc>截取子字符串,从start开始,取count个</desc>
+			</function>
+			<function >
+			    <name>最后一天</name>
+				<content><![CDATA[last_day(date)]]></content>
+				<desc>返回当月后一天</desc>
+			</function>
+		</exeMethod>
+	</group>
+	<!-- 自定义 -->
+	<group type="custom">
+		<exeMethod type="java">
+			<function >
+				<name>数字相加</name>
+				<content><![CDATA[add(number1,number2)]]></content>
+				<desc>将 Date 对象转化化特定格式的字符串</desc>
+			</function>
+			<function >
+				<name>条件判断</name>
+				<content><![CDATA[iff(expr,number1,number2)]]></content>
+				<desc>判断expr返回结果，true执行number1，false执行number2</desc>
+			</function>
+		</exeMethod>
+	</group>
+		
+</functions>

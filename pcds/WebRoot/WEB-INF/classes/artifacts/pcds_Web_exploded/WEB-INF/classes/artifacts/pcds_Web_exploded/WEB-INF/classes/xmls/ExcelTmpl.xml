@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 配置说明-->
+<!-- 
+	id="up201412051857070014"   对应的模板ID
+	name="银"  对应导入模板sheet页的名称
+	mapping:
+	映射execl模板中的列，顺序要一致
+	<dataStart>2</dataStart>
+	对应导入模板中数据开始的行数
+-->
+<templates>
+    <!-- 承兑汇票-卖断 -->
+	<template id="up20150402938080058">
+		<excels>
+			<excel>
+				<sheet name="银">
+					<sql>
+						<delete>
+							delete from imp_acpt_bill_txn where draft_no = #draft_no
+						</delete>
+						<insert>
+							insert into imp_acpt_bill_txn
+							(draft_no,bill_flag,bill_amt,issue_date,due_date,repurchase_date,acpt_bank_name,acpt_bank_no,issue_person_name,
+							rediscount_date,int_rate,actual_days,remote_add_days,week_day,holiday_add_days,convert_days,discount_amt,actual_amt,contract_no)
+							values
+							(#draft_no,'0',#bill_amt,#issue_date,#due_date,#repurchase_date,#acpt_bank_name,#acpt_bank_no,#issue_person_name,
+							#rediscount_date,#int_rate,#actual_days,#remote_add_days,to_char(#due_date-1,'d'),#holiday_add_days,#convert_days,#discount_amt,#actual_amt,#contract_no)
+						</insert>
+					</sql>
+					<mapping>
+						draft_no,bill_amt,issue_date,due_date,repurchase_date,acpt_bank_name,acpt_bank_no,issue_person_name,rediscount_date,int_rate,actual_days,remote_add_days,week_day,holiday_add_days,convert_days,discount_amt,actual_amt
+					</mapping>
+					<body>
+						<dataStart>2</dataStart>
+					</body>
+				</sheet>
+				<sheet name="商">
+					<sql>
+						<delete>
+							delete from imp_acpt_bill_txn where draft_no = #draft_no
+						</delete>
+						<insert>
+							insert into imp_acpt_bill_txn
+							(draft_no,bill_flag,bill_amt,issue_date,due_date,repurchase_date,acpt_bank_name,acpt_bank_no,issue_person_name,
+							rediscount_date,int_rate,actual_days,remote_add_days,week_day,holiday_add_days,convert_days,discount_amt,actual_amt,contract_no)
+							values
+							(#draft_no,'1',#bill_amt,#issue_date,#due_date,#repurchase_date,#acpt_bank_name,#acpt_bank_no,#issue_person_name,
+							#rediscount_date,#int_rate,#actual_days,#remote_add_days,to_char(#due_date-1,'d'),#holiday_add_days,#convert_days,#discount_amt,#actual_amt,#contract_no)
+						</insert>
+					</sql>
+					<mapping>
+						draft_no,bill_amt,issue_date,due_date,repurchase_date,acpt_bank_name,acpt_bank_no,issue_person_name,rediscount_date,int_rate,actual_days,remote_add_days,week_day,holiday_add_days,convert_days,discount_amt,actual_amt
+					</mapping>
+					<body>
+						<dataStart>2</dataStart>
+					</body>
+				</sheet>
+			</excel>
+		</excels>
+	</template>
+	<!-- 承兑汇票-买断 -->
+	<template id="up20150402940270062">
+		<excels>
+			<excel>
+				<sheet name="银">
+					<sql>
+						<delete>
+							delete from imp_acpt_bill_txn where draft_no = #draft_no
+						</delete>
+						<insert>
+							insert into imp_acpt_bill_txn
+							(draft_no,bill_flag,bill_amt,issue_date,due_date,repurchase_date,acpt_bank_name,acpt_bank_no,issue_person_name,
+							rediscount_date,int_rate,actual_days,remote_add_days,week_day,holiday_add_days,convert_days,discount_amt,actual_amt,contract_no)
+							values
+							(#draft_no,'0',#bill_amt,#issue_date,#due_date,#repurchase_date,#acpt_bank_name,#acpt_bank_no,#issue_person_name,
+							#rediscount_date,#int_rate,#actual_days,#remote_add_days,to_char(#due_date-1,'d'),#holiday_add_days,#convert_days,#discount_amt,#actual_amt,#contract_no)
+						</insert>
+					</sql>
+					<mapping>
+						draft_no,bill_amt,issue_date,due_date,repurchase_date,acpt_bank_name,acpt_bank_no,issue_person_name,rediscount_date,int_rate,actual_days,remote_add_days,week_day,holiday_add_days,convert_days,discount_amt,actual_amt
+					</mapping>
+					<body>
+						<dataStart>2</dataStart>
+					</body>
+				</sheet>
+				<sheet name="商">
+					<sql>
+						<delete>
+							delete from imp_acpt_bill_txn where draft_no = #draft_no
+						</delete>
+						<insert>
+							insert into imp_acpt_bill_txn
+							(draft_no,bill_flag,bill_amt,issue_date,due_date,repurchase_date,acpt_bank_name,acpt_bank_no,issue_person_name,
+							rediscount_date,int_rate,actual_days,remote_add_days,week_day,holiday_add_days,convert_days,discount_amt,actual_amt,contract_no)
+							values
+							(#draft_no,'1',#bill_amt,#issue_date,#due_date,#repurchase_date,#acpt_bank_name,#acpt_bank_no,#issue_person_name,
+							#rediscount_date,#int_rate,#actual_days,#remote_add_days,to_char(#due_date-1,'d'),#holiday_add_days,#convert_days,#discount_amt,#actual_amt,#contract_no)
+						</insert>
+					</sql>
+					<mapping>
+						draft_no,bill_amt,issue_date,due_date,repurchase_date,acpt_bank_name,acpt_bank_no,issue_person_name,rediscount_date,int_rate,actual_days,remote_add_days,week_day,holiday_add_days,convert_days,discount_amt,actual_amt
+					</mapping>
+					<body>
+						<dataStart>2</dataStart>
+					</body>
+				</sheet>
+			</excel>
+		</excels>
+	</template>
+</templates>

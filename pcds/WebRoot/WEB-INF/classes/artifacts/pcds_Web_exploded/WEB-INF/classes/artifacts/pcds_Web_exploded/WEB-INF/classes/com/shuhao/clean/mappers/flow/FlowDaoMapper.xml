@@ -1,0 +1,620 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shuhao.clean.apps.flow.dao.FlowDao">
+
+	<select id="flowList" resultType="map">
+		 select * from upp_flow_status
+	</select>
+	
+	<insert id="addFlowStatus" parameterType="map">
+		insert into upp_flow_status(flow_status_code,flow_status_name,flow_status_desc,icon_path)
+			values(#{flow_status_code},#{flow_status_name},#{flow_status_desc},#{icon_path})
+	</insert>
+	
+	<update id="updateFlow" parameterType="map">
+		update upp_flow_status 
+			set flow_status_name=#{flow_status_name},
+				flow_status_desc=#{flow_status_desc},
+				icon_path=#{icon_path}
+		where flow_status_code=#{flow_status_code}
+	</update>
+	
+	<delete id="delFlow" parameterType="map">
+		delete from upp_flow_status where flow_status_code=#{flow_status_code}
+	</delete>
+	
+	<select id="getFlowById" parameterType="map" resultType="map">
+		select * from upp_flow_status where flow_status_code=#{flow_status_code}
+	</select>
+	
+	<select id="queryUppEnterType" resultType="map">
+		select * from upp_enter_type order by enter_type_code
+	</select>
+	
+	<insert id="addBlmb" parameterType="map">
+		insert into upp_template(tmpl_id,prt_tmpl_id,template_name,template_desc,template_type_cd,
+			enter_type_cd,create_user_id,create_time,status_cd,display_order,rela_metadata_names,
+			is_shared)
+		values(#{tmpl_id},#{prt_tmpl_id},#{template_name},#{template_desc},#{template_type_cd,jdbcType=VARCHAR},#{enter_type_cd,jdbcType=VARCHAR},
+			#{create_user_id},now(),#{status_cd,jdbcType=VARCHAR},#{display_order},#{rela_metadata_names,jdbcType=VARCHAR}
+			,#{is_shared,jdbcType=VARCHAR})
+	</insert>
+	
+	<update id="updateBlmb" parameterType="map">
+		update upp_template
+			set template_name=#{template_name},template_desc=#{template_desc,jdbcType=VARCHAR},template_type_cd=#{template_type_cd,jdbcType=VARCHAR},
+				enter_type_cd=#{enter_type_cd,jdbcType=VARCHAR},display_order=#{display_order,jdbcType=VARCHAR},
+				update_user_id=#{update_user_id},update_time=now(),rela_metadata_names=#{rela_metadata_names,jdbcType=VARCHAR},
+				is_shared=#{is_shared,jdbcType=VARCHAR}
+		where tmpl_id=#{tmpl_id}
+	</update>
+	
+	<update id="publicBlmb" parameterType="map">
+		update upp_template
+			set status_cd=#{status_cd,jdbcType=VARCHAR}
+		where tmpl_id=#{tmpl_id}
+	</update>
+	
+	<delete id="delBlmb" parameterType="map">
+		delete from upp_template where tmpl_id=#{tmpl_id}
+	</delete>
+	
+	<select id="findBlmbById" parameterType="map" resultType="map">
+		select a.*, b.page_element_id page_struct_id, c.flow_tmpl_id,b.version_no
+		  from upp_template a
+		  left join upp_tmpl_page b
+		    on a.tmpl_id = b.tmpl_id
+		  left join upp_tmpl_flow c
+		    on a.tmpl_id = c.tmpl_id
+		 where a.tmpl_id = #{tmpl_id}
+	</select>
+	
+	<select id="listAllTable" resultType="map">
+		select * from upp_table
+	</select>
+	
+	<select id="listAllPage" resultType="map">
+		select * from Upp_Page_Struct where md_cate_cd ='PAG'
+	</select>
+	
+	<insert id="addBlmbPage" parameterType="map">
+	 <!-- begin -->
+		insert into upp_tmpl_page (tmpl_id,page_element_id,version_no,is_curr_version) values(#{tmpl_id},#{page_struct_id},#{version_no,jdbcType=VARCHAR},'Y');
+		update upp_tmpl_page set is_curr_version = 'N' where tmpl_id = #{tmpl_id} and page_element_id!=#{page_struct_id};
+	<!-- end; -->
+	</insert>
+	
+	
+	<delete id="delBlmbPage" parameterType="map">
+		delete from upp_tmpl_page where tmpl_id=#{tmpl_id} 
+		<if test="page_struct_id!=null and page_struct_id!=''">
+			and page_element_id=#{page_struct_id}
+		</if>
+	</delete>
+	
+	
+	<select id="nodeTableList" parameterType="map" resultType="map">
+		select c.*
+		    from upp_tmpl_table b, upp_table c
+		   where b.table_id = c.table_id
+		     and b.tmpl_id = #{tmpl_id}
+	</select>
+	
+	<select id="nodeGnList" parameterType="map" resultType="map">
+		  select c.*
+		  from upp_dic_fn_rela a
+		  left join  upp_metadata b on a.db_obj_id=b.prt_metadata_id
+	      left join upp_column c on c.column_id=b.metadata_id
+	      where a.metadata_id = #{page_struct_id}
+	      order by b.display_order
+	</select>
+	
+	<select id="getApplyList" parameterType="map" resultType="map">
+		<include refid="common.pagingHead"/>
+		<include refid="getApplyListSql"/>
+		<include refid="common.pagingEnd"/>
+	</select>
+	
+	<select id="getApplyListCount" parameterType="map" resultType="int">
+		select count(1) from (<include refid="getApplyListSql"/>)
+	</select>
+	
+	<sql id="getApplyListSql">
+		select a.task_id,
+		       a.status_code,
+		       a.tmpl_id,
+		       a.table_id,
+		       a.table_data_id,
+		       a.apply_user_id,
+		       a1.user_name apply_user_name,
+		       c.flow_status_code,
+		       c.flow_status_name,
+		       to_char(a.apply_date, 'yyyy-mm-dd hh24:mi:ss') apply_date,
+		       a2.user_name approve_user_name,
+		       to_char(a.approve_date, 'yyyy-mm-dd hh24:mi:ss') approve_date
+		  from upp_approve_info a
+		  left join opm_sys_user_info a1
+		    on a.apply_user_id = a1.cust_mgr_id
+		  left join opm_sys_user_info a2
+		    on a.approve_user_id = a2.cust_mgr_id, upp_flow_status c
+		 where a.status_code = c.flow_status_code
+		   and c.flow_status_code = #{flow_status_code}
+		   and a.apply_user_id=#{login_user_id}
+	</sql>
+	
+	<!-- 提交流程
+			先插入流程结果表    再插入流程过程表
+	 -->
+	<update id="applyFlow" parameterType="map">
+		<if test="applyType == 'submit'">
+			update upp_approve_info set status_code='02',apply_date=now(),approve_user_id=null,approve_date=null where task_id=#{task_id}
+		</if>
+		<if test="applyType != 'submit'">
+		insert into upp_approve_info(task_id,status_code,tmpl_id,table_id,table_data_id,apply_user_id,apply_date)
+			values(#{task_id},'01',#{tmpl_id},#{table_id},#{table_data_id},#{apply_user_id},now())
+		</if>
+	</update>
+	
+	<select id="addApplyTrans" parameterType="map">
+		insert into upp_approve_trans(task_id,status_code,apply_user_id,apply_date)
+					select task_id,status_code,apply_user_id,apply_date from upp_approve_info where task_id=#{task_id}
+	</select>
+	
+	<!-- 撤回操作 修改结果表状态   新增流水-->
+	<select id="reback" parameterType="map">
+		<![CDATA[
+			BEGIN
+			update upp_approve_info set status_code='03' where task_id=#{task_id};
+			insert into upp_approve_trans(task_id,status_code,apply_user_id,apply_date)
+						select task_id,status_code,apply_user_id,apply_date from upp_approve_info where task_id=#{task_id};
+			END;
+		]]>
+	</select>
+	
+	<!-- 一级审批 通过或退回-->
+	<select id="reApprove" parameterType="map">
+		<!-- approve_status==01  通过   02  退回 -->
+	<![CDATA[
+		BEGIN
+			update upp_approve_info set status_code=#{status_code},approve_user_id=#{approve_user_id},approve_date=now() where task_id=#{task_id};
+			insert into upp_approve_trans(task_id,status_code,apply_user_id,apply_date,approve_user_id,approve_date,remark)
+						select task_id,status_code,apply_user_id,apply_date,approve_user_id,approve_date,#{remark} from upp_approve_info where task_id=#{task_id};
+		END;
+		]]>
+	</select>
+	
+	<!-- 终审 -->
+	<select id="resultApprove" parameterType="map">
+		<!-- approve_status==01  通过   02  退回 -->
+	<![CDATA[
+		BEGIN
+			update upp_approve_info set status_code=#{status_code},approve_user_id=#{approve_user_id},approve_date=now() where task_id=#{task_id};
+			insert into upp_approve_trans(task_id,status_code,apply_user_id,apply_date,approve_user_id,approve_date,remark)
+						select task_id,status_code,apply_user_id,apply_date,approve_user_id,approve_date,#{remark} from upp_approve_info where task_id=#{task_id};
+		END;
+		]]>
+	</select>
+	
+	<!-- 删除流程   删除流水及结果表 -->
+	<delete id="deleteFlow" parameterType="map">
+		<![CDATA[
+		BEGIN
+			delete from upp_approve_trans where task_id = (select task_id from upp_approve_info where table_data_id=#{table_data_id});
+			delete from upp_approve_info where table_data_id=#{table_data_id};
+		END;
+		]]>
+	</delete>
+	
+	<select id="listAllFlowTmpl" resultType="map">
+	    select '' flow_tmpl_id, '无审批流程' flow_tmpl_name from dual union all
+		select t.flow_tmpl_id,t.flow_tmpl_name from upp_flow_tmpl t where t.status_cd='Y'
+	</select>
+	
+	<insert id="addblmbFlow" parameterType="map">
+		insert into upp_tmpl_flow (tmpl_id,flow_tmpl_id) values(#{tmpl_id},#{flow_tmpl_id})
+	</insert>
+	
+	<delete id="delBlmbFlow" parameterType="map">
+		delete from upp_tmpl_flow where tmpl_id = #{tmpl_id}
+	</delete>
+	
+	<select id="getApproveList" parameterType="map" resultType="map">
+		<include refid="common.pagingHead"/>
+		<include refid="getApproveListSql"/>
+		<include refid="common.pagingEnd"/>
+	</select>
+	
+	<select id="getApproveListCount" parameterType="map" resultType="int">
+		select count(1) from (<include refid="getApproveListSql"/>)
+	</select>
+	
+	<sql id="getApproveListSql">
+		<!-- 
+		select a.bl_info_id,
+		       a.flow_status_code,
+		       a.apply_user_id,
+		       to_char(a.apply_time, 'yyyy-mm-dd hh24:mi:ss') apply_time
+		  from upp_bl_info a
+		 where a.flow_status_code = '02'
+		 -->
+		 select a.task_id,
+		       a.status_code,
+		       a.tmpl_id,
+	           a.table_id,
+	           a.table_data_id,
+	           a.apply_user_id,
+	           a1.user_name apply_user_name,
+	           c.flow_status_code,
+	           c.flow_status_name,
+	           to_char(a.apply_date, 'yyyy-mm-dd hh24:mi:ss') apply_date,
+	           a2.user_name approve_user_name,
+	           to_char(a.approve_date, 'yyyy-mm-dd hh24:mi:ss') approve_date,
+	           a3.remark
+	      from upp_approve_info a
+	      left join opm_sys_user_info a1
+	        on a.apply_user_id = a1.cust_mgr_id
+	      left join opm_sys_user_info a2
+	        on a.approve_user_id = a2.cust_mgr_id
+	      left join upp_approve_trans a3
+	        on a.task_id = a3.task_id
+	       and a.status_code = a3.status_code
+	       and a.apply_user_id = a3.apply_user_id
+	       and a.approve_date = a3.approve_date, upp_flow_status c,opm_sys_user_info d,dmd_bank_relation e
+	     where a.status_code = c.flow_status_code
+	       and a.apply_user_id=d.cust_mgr_id
+	       and d.bank_org_id=e.bank_org_id
+	       and e.bank_rela_type_cd='00'
+	       and e.parent_bank_org_id=(select bank_org_id from opm_sys_user_info where cust_mgr_id=#{login_user_id})
+	       and c.flow_status_code = #{flow_status_code}
+	</sql>
+	
+	<insert id="addApproTrans" parameterType="map">
+		<!-- 撤回或提交操作时   审批状况为空  只再次增加一个流水即可 -->
+		<if test="flow_status_code=='03' or flow_status_code=='02'">
+			insert into upp_approve_trans(task_id,status_code,apply_user_id,apply_date,remark)
+			select task_id,#{flow_status_code},apply_user_id
+			<if test="flow_status_code=='02'">
+				,now()
+			</if>
+			<if test="flow_status_code!='02'">
+				,apply_date
+			</if>
+			,#{remark} from upp_approve_info where task_id=#{task_id}
+		</if>
+		<if test="flow_status_code!='03' and flow_status_code!='02'">
+			insert into upp_approve_trans(task_id,status_code,apply_user_id,apply_date,approve_user_id,approve_date,remark)
+			select task_id,#{flow_status_code},apply_user_id,apply_date,#{approve_user_id},approve_date,#{remark} from upp_approve_info where task_id=#{task_id}
+		</if>
+		
+	</insert>
+	
+	<update id="updateApproStatus" parameterType="map">
+		update upp_approve_info t
+         set t.status_code     = #{flow_status_code}
+         <if test="apply_user_id!=null and apply_user_id!=''">
+             ,t.apply_user_id   = #{apply_user_id}
+             ,t.apply_date      = now()
+             ,t.approve_user_id = null
+             ,t.approve_date    = null
+         </if>
+          <if test="approve_user_id!=null and approve_user_id!=''">
+             ,t.approve_user_id = #{approve_user_id}
+             ,t.approve_date    = now()
+          </if>
+       where t.task_id = #{task_id}
+	</update>
+	
+	<!-- 查询所有模版 ,有子模版的单独给一个类型-->
+	<select id="getAllTmpl" parameterType="map" resultType="com.shuhao.clean.apps.meta.entity.UppTmplate">
+		select t.tmpl_id,
+			t.prt_tmpl_id,
+			t.template_name,
+			t.template_desc,
+			case when b.tmpl_id is null then t.template_type_cd else '03' end template_type_cd,
+			t.enter_type_cd,
+			t.create_user_id,
+			t.create_time,
+			t.update_user_id,
+			t.update_time,
+			t.status_cd,
+			t.display_order,
+			t.rela_metadata_names 
+		  from upp_template t
+		  left join upp_template b on b.prt_tmpl_id = t.tmpl_id and b.rela_metadata_names is not null
+		  where 1=1
+		<if test="queryAll != null and queryAll == 'no'">
+			and t.tmpl_id not in (
+			select a.tmpl_id from upp_template a
+			where a.rela_metadata_names is not null
+			)
+			and t.status_cd = '02'
+		</if>
+		<if test="'00000'!=login_user_id">
+			and t.tmpl_id in (
+	        select tmpl_id from upp_template where template_type_cd='01'
+	        union all
+	        select a.tmpl_id from upp_template a,upp_user_template b 
+            where a.tmpl_id=b.tmpl_id and b.cust_mgr_id=#{login_user_id} and a.status_cd='02')
+		</if>
+		order by t.template_type_cd,t.display_order
+	</select>
+	
+	<select id="getTableName" parameterType="map" resultType="string">
+		select b.table_name from upp_tmpl_table a,upp_table b where a.table_id=b.table_id and a.tmpl_id=#{tmpl_id}
+	</select>
+	
+	<!-- 按模版ID 查询补录补录表 -->
+	<select id="getTableNameByTmpl" parameterType="map" resultType="string">
+	  select c.metadata_name table_name
+	    from upp_tmpl_page p, upp_page_struct a
+	    left join upp_dic_fn_rela b
+	      on a.page_struct_id = b.metadata_id
+	    left join upp_metadata c
+	      on b.db_obj_id = c.metadata_id
+	   where p.page_element_id = a.page_struct_id
+	     and p.tmpl_id = #{tmpl_id}
+	</select>
+	
+	<select id="getProductId" parameterType="map" resultType="string">
+		select a01.default_value product_id
+		  from upp_metadata a0, upp_page_field a01
+		 where a0.prt_metadata_id =
+		       (select a2.metadata_id 
+		          from upp_tmpl_table a1, upp_dic_fn_rela a2
+		         where a1.tmpl_id = #{tmpl_id}
+		           and a1.table_id = a2.db_obj_id)
+		   and a0.metadata_name = 'DEFAULT_PRODUCT_ID'
+		   and a0.metadata_id = a01.field_id
+
+	</select>
+	
+	<select id="queryTotalCe" parameterType="map" resultType="string">
+		select c.currency_desc,
+		       a.balance as left_value,
+		       b.balance as right_value,
+		       b.balance - a.balance as diff_value
+		  from (select curr_cd, sum(balance) as balance
+		          from ${table_name}
+		         where flow_status_code in ('02','04','11')
+		           and finance_org_id in
+		               (select bank_org_id
+		                  from dmd_bank_relation
+		                 where parent_bank_org_id = #{user_bank_id}
+		                   and bank_rela_type_cd = '00')
+		         group by curr_cd) a,
+		       (select curr_cd, sum(abs(curr_dr_bal - curr_cr_bal)) as balance
+		          from dw_gl_his
+		         where bank_org_id in
+		               (select bank_org_id
+		                  from dmd_bank_relation
+		                 where parent_bank_org_id = #{user_bank_id}
+		                   and bank_rela_type_cd = '00')
+		           and record_dt =
+		               (select max(biz_date)
+		                  from ${table_name}
+		                 where flow_status_code = '05'
+		                   and finance_org_id in
+		                       (select bank_org_id
+		                          from dmd_bank_relation
+		                         where parent_bank_org_id = #{user_bank_id}
+		                           and bank_rela_type_cd = '00'))
+		           and ledger_type_cd = '00'
+		           and prod_grp_id like '${product_id}%' group by curr_cd) b,
+		       dmd_currency c
+		 where a.curr_cd = b.curr_cd
+		   and a.curr_cd = c.currency_code
+	</select>
+	
+	<!-- 删除模板与功能关系 --><!-- 新增模板与功能关系 -->
+	<select id="delAndAddBlmbGn" parameterType="string">
+		<![CDATA[
+			BEGIN
+				delete from upp_tpml_fn_rela where tmpl_id in (
+					select c.tmpl_id
+					  from upp_metadata a, upp_dic_fn_rela b,upp_tmpl_table c
+					 where a.metadata_id = #{metadata_id}
+					   and a.parent_metadata_id = b.fn_metadata_id
+					   and b.dic_metadata_id=c.table_id);
+				
+					insert into upp_tpml_fn_rela(tmpl_id,metadata_id)
+					with t as (
+					     select c.tmpl_id
+					    from upp_metadata a, upp_dic_fn_rela b,upp_tmpl_table c
+					   where a.metadata_id = #{metadata_id}
+					     and a.parent_metadata_id = b.fn_metadata_id
+					     and b.dic_metadata_id=c.table_id
+					)
+					select * from (
+					select a.tmpl_id,b.fn_metadata_id from upp_tmpl_table a,upp_dic_fn_rela b,t where a.table_id=b.dic_metadata_id and a.tmpl_id=t.tmpl_id
+					union all
+					select a.tmpl_id,c.metadata_id from upp_tmpl_table a,upp_dic_fn_rela b,upp_metadata c,t
+					 where a.table_id=b.dic_metadata_id and a.tmpl_id=t.tmpl_id
+					 and c.parent_metadata_id=b.fn_metadata_id);
+			END;
+		]]>
+	</select>
+	
+	<insert id="applyFlowList" parameterType="java.util.List">
+		<if test="status_code!=null and status_code!=''">
+			update upp_approve_info set status_code='02',apply_date=now(),approve_user_id=null,approve_date=null,remark=null where task_id in 
+			<foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+				#{item.task_id}
+			</foreach>
+		</if>
+		<if test="status_code==null and status_code==''">
+			insert into upp_approve_info(task_id,status_code,tmpl_id,table_id,table_data_id,apply_user_id,apply_date)
+			<foreach collection="list" item="item" index="index" separator="union all"> 
+				select #{item.task_id},'02',#{item.tmpl_id},#{item.table_id},#{item.table_data_id},#{item.apply_user_id},now() from dual
+			</foreach>
+		</if>
+	</insert>
+	
+	<select id="getTaskByDateId" parameterType="string" resultType="string">
+		select t.task_id from upp_approve_info t where t.table_data_id = #{data_id}
+	</select>
+	
+	
+	<select id="getBlmbByUserId" parameterType="map" resultType="map">
+		select * from upp_user_template where cust_mgr_id=#{cust_mgr_id}
+	</select>
+	
+	<select id="listBlmb" parameterType="map" resultType="map">
+		select * from upp_template t where t.template_type_code='02' and t.status_code='02' order by t.display_order
+	</select>
+	
+	<insert id="addUserBlmb" parameterType="java.util.List">
+		insert into upp_user_template(cust_mgr_id,user_name,tmpl_id,tmpl_name)
+			<foreach collection="list" item="item" index="index" separator="union all">  
+				select a.cust_mgr_id,a.user_name,b.tmpl_id,b.template_name 
+					from opm_sys_user_info a,upp_template b where a.cust_mgr_id=#{item.cust_mgr_id} and b.tmpl_id=#{item.tmpl_id}
+			</foreach>
+	</insert>
+	
+	<delete id="delUserBlmb" parameterType="map">
+		delete from upp_user_template where cust_mgr_id=#{cust_mgr_id}
+	</delete>
+	
+	<insert id="addUserBlmb2" parameterType="java.util.List">
+		<!-- BEGIN -->
+			<foreach collection="list" item="item" index="index" separator=""> 
+			delete from upp_user_template where cust_mgr_id=#{item.cust_mgr_id} and tmpl_id=#{item.tmpl_id};
+			insert into upp_user_template(cust_mgr_id,user_name,tmpl_id,template_name)
+				values(#{item.cust_mgr_id},#{item.user_name},#{item.tmpl_id},#{item.tmpl_name});
+			</foreach>
+		<!-- END; -->
+	</insert>
+	
+	<select id="getUserByBlmbCount" parameterType="map" resultType="int">
+		select count(1) from (<include refid="getUserByBlmbSql"/>) e
+	</select>
+	
+	<select id="getUserByBlmb" parameterType="map" resultType="map">
+		<include refid="common.pagingHead"/>
+		<include refid="getUserByBlmbSql"/>
+		<include refid="common.pagingEnd"/>
+		
+	</select>
+	
+	<sql id="getUserByBlmbSql">
+		select * from upp_user_template where tmpl_id=#{tmpl_id} order by cust_mgr_id
+	</sql>
+	
+	<select id="getUserList" parameterType="map" resultType="map">
+		<include refid="common.pagingHead"/>
+		<include refid="getUserListSql"/>
+		<include refid="common.pagingEnd"/>
+	</select>
+	
+	<select id="getUserListCount" parameterType="map" resultType="int">
+		select count(1) from (<include refid="getUserListSql"/>) e
+	</select>
+	
+	<sql id="getUserListSql">
+		select a.*
+		  from opm_sys_user_info a, dmd_bank_relation b
+		 where a.bank_org_id = b.bank_org_id
+		   and b.bank_rela_type_cd = '00'
+		   and b.parent_bank_org_id = #{login_org_id}
+		<if test="cust_mgr_id != null and cust_mgr_id != ''">
+			and (cust_mgr_id like '%${cust_mgr_id}%' or user_name like '%${cust_mgr_id}%')
+		</if>
+			and not exists (select 1 from upp_user_template c where a.cust_mgr_id=c.cust_mgr_id and c.tmpl_id=#{tmpl_id})
+			
+		 order by a.cust_mgr_id
+	</sql>
+	
+	<select id="removeUser" parameterType="java.util.List">
+		<!-- BEGIN -->
+		<foreach collection="list" item="item" index="index" separator=""> 
+			delete from upp_user_template where cust_mgr_id=#{item.cust_mgr_id} and tmpl_id=#{item.tmpl_id};
+		</foreach>
+		<!-- END; -->
+	</select>
+	
+	<insert id="addFlowInfo" parameterType="map">
+		insert into 
+			wgl_flow_info (
+				flow_id,
+				flow_name,
+				json_str,
+				create_user_id,
+				create_time
+			)
+		values(
+				#{flow_id},
+				#{flow_name},
+				#{jsondata},
+				#{login_user_id},
+				now()
+			)
+	</insert>
+	
+	<insert id="updateFlowInfo" parameterType="map">
+		update  wgl_flow_info
+		   set  flow_name = #{flow_name},
+			    json_str = #{jsondata},
+			    update_user_id = #{login_user_id},
+			    update_time = now()
+		where flow_id = #{flow_id}
+	</insert>
+	
+	<delete id="deleteFlowInfo" parameterType="map">
+		delete from wgl_flow_info
+		where flow_id = #{flow_id}
+	</delete>
+	
+	<select id="getJsonData" parameterType="map" resultType="string">
+		select json_str from wgl_flow_info where flow_id=${flow_id}
+	</select>
+	
+	<select id="listAllFlow" resultType="map">
+		select  flow_id,
+				flow_name,
+				to_char(create_time,'yyyy/mm/dd') create_time
+		from  wgl_flow_info 
+		order by flow_id
+	</select>
+	
+	<insert id="addNodeDetail" parameterType="java.util.List">
+		insert into wgl_flow_node(flow_id,node_id,node_name,node_model,node_type,node_from_id,node_to_id)
+		<foreach collection="list" item="item" index="index" separator="union"> 
+			select ${item.flow_id},#{item.node_id},#{item.node_name},#{item.node_model},#{item.node_type},#{item.node_from_id},#{item.node_to_id} from dual
+		</foreach>
+	</insert>
+	
+	<delete id="deleteNodeDetail" parameterType="map">
+		delete from wgl_flow_node
+		where flow_id = #{flow_id}
+	</delete>
+	<select id="getPageInfo" resultType="map">
+		select * from upp_page_struct a
+		left join upp_tmpl_page b on a.page_struct_id = b.page_element_id
+		where b.tmpl_id = #{tmpl_id}
+		order by b.is_curr_version desc,b.version_no asc
+	</select>
+	<select id="getPageFdl" resultType="map">
+		select c.* from upp_metadata a
+		inner join upp_metadata b on a.prt_metadata_id =b.metadata_id 
+		inner join upp_page_field c on a.metadata_id = c.field_id
+		<if test="tmpl_id!=null and tmpl_id!=''">
+			left join upp_tmpl_page d on b.prt_metadata_id= d.page_element_id
+			where  b.md_cate_cd='FDL' and d.tmpl_id = #{tmpl_id} and d.is_curr_version= 'Y'
+		</if>
+		<if test="page_struct_id!=null and page_struct_id!=''">
+			where b.prt_metadata_id = #{page_struct_id} and b.md_cate_cd='FDL'
+		</if>
+		order by c.display_order
+	</select>
+	<select id="getFlowInfo" resultType="map">
+		<!-- select a.flow_tmpl_id,a.flow_tmpl_name,a.flow_tmpl_desc,decode(a.status_cd,'Y','发布','N','未发布','') status_cd from upp_flow_tmpl a  -->
+		select a.flow_tmpl_id,a.flow_tmpl_name,a.flow_tmpl_desc,a.status_cd as status_cd from upp_flow_tmpl a 
+		left join upp_tmpl_flow b on a.flow_tmpl_id=b.flow_tmpl_id
+		where b.tmpl_id=#{tmpl_id}
+	</select>
+	
+	<update id="setCurrent" parameterType="map">
+	update upp_tmpl_page a set a.is_curr_version = (case when page_element_id = #{page_struct_id} then 'Y' else 'N' end ) where  tmpl_id=#{tmpl_id}
+	</update>
+</mapper>

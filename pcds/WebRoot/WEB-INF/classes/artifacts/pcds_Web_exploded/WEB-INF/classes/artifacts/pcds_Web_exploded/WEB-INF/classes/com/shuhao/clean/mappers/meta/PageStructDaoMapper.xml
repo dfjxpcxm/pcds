@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.shuhao.clean.apps.meta.dao.PageStructDao">
+	
+	<!-- 添加页面结构对象 -->
+	<insert id="addPageStruct" parameterType="UppPageStruct">
+		insert into upp_page_struct (
+			page_struct_id,
+			page_struct_name,
+			page_struct_desc,
+			md_cate_cd
+		) values (
+			#{page_struct_id},
+			#{page_struct_name},
+			#{page_struct_desc},
+			#{md_cate_cd}
+		)
+	</insert>
+	
+	
+	<!-- 根据id获取页面结构对象 -->
+	<select id="getPageStructById" parameterType="string" resultType="UppPageStruct">
+		select 
+			a.page_struct_id,
+			a.page_struct_name,
+			a.page_struct_desc,
+			a.md_cate_cd,
+		    c.metadata_id rela_table_id,
+		    c.metadata_desc rela_table_name
+		from 		upp_page_struct a
+	    left join	upp_dic_fn_rela b
+	         on     a.page_struct_id = b.metadata_id
+	    left join   upp_metadata c
+    		 on     b.db_obj_id = c.metadata_id
+		where a.page_struct_id = #{page_struct_id}
+	</select>
+	
+	<!-- 保存页面结构对象 -->
+	<update id="savePageStruct" parameterType="UppPageStruct">
+		update 
+			upp_page_struct a
+		set
+			a.page_struct_name = #{page_struct_name},
+			a.page_struct_desc = #{page_struct_desc},
+			a.md_cate_cd = #{md_cate_cd} 
+		where a.page_struct_id = #{page_struct_id}
+	</update>
+	
+	<!-- 删除页面结构对象 -->
+	<delete id="deletePageStruct" parameterType="string">
+		delete from upp_page_struct a where a.page_struct_id = #{page_struct_id}
+	</delete>
+	
+	<!-- 查询通用页面结构所属页面 -->
+	<select id="querySimplePageParent" parameterType="string" resultType="map">
+		select a.prt_metadata_id page_id
+		  from upp_metadata a
+		 where a.metadata_id = #{metadata_id}
+	</select>
+	
+	<!-- 查询按钮所属页面 -->
+	<select id="queryPageByBtn" parameterType="string" resultType="map">
+		select a.prt_metadata_id page_id
+		  from upp_metadata a
+		 where a.metadata_id in
+		       (select b.prt_metadata_id 
+		          from upp_metadata b
+		         where b.metadata_id = #{metadata_id})
+	</select>
+	<!-- 删除模板页面关联关系 -->
+	<select id="deleteTmplPageRela" parameterType="string" >
+		delete from upp_tmpl_page where page_element_id = #{page_struct_id}
+	</select>
+</mapper>

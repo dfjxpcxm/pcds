@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="pcds"
+  id="myeclipse.1416647323355"
+  context-root="/pcds"
+  j2ee-spec="5.0"
+  archive="pcds.war">
+  <attributes>
+    <attribute name="webrootdir" value="WebRoot" />
+  </attributes>
+</project-module>
+

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shuhao.clean.apps.base.dao.DataStoreDao">
+
+	<!-- 获取机构树表 -->
+	<select id="getBankList" resultType="Bank">
+		 select * from dmd_bank_inter_org where bank_org_type_code in ('01','02') order by display_order 
+	</select>
+	
+	<!-- 获取菜单树列表 -->
+	<select id="getResourceList" resultType="SysResourceInfo">
+		select * from opm_sys_resource order by resource_id
+	</select>
+	
+	<!-- 获取菜单树列表 -->
+	<select id="getMeasureList" resultType="Measure">
+		select 
+			measure_id,
+			measure_name,
+			parent_measure_id,
+			to_char(begin_date,'yyyy-mm-dd') begin_date,
+			to_char(end_date,'yyyy-mm-dd') end_date,
+			measure_tree_code,
+			measure_level,
+			measure_property 
+		from dmd_measure 
+		order by measure_id
+	</select>
+	
+	<!-- 产品表 -->
+	<select id="getProductList" resultType = "DmdProduct">
+		select 
+			product_id,
+			product_name,
+			parent_product_id,
+			asset_type_code,
+			bal_dir 
+		from dmd_product
+		order by product_id
+	</select>
+	
+</mapper>

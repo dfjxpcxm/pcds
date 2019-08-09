@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shuhao.clean.apps.base.dao.CustMgrDao">
+	
+	 <!-- 查询客户经理-->
+	<sql id="listCustMgrSql">
+		select distinct t.cust_mgr_id,t.cust_mgr_name from dmd_cust_mgr t inner join dmd_bank_relation a
+			on t.bank_org_id = a.bank_org_id inner join dmd_busi_line_rela b on t.busi_line_id = b.busi_line_id
+			where a.bank_rela_type_cd = '00' and a.parent_bank_org_id = '${bank_org_id}'
+			and b.parent_line_id  = '${busi_line_id}'
+		   <if test=" enter_cust_mgr_id != null and enter_cust_mgr_id !='' ">
+		  	   and (   t.cust_mgr_id   like '%${enter_cust_mgr_id}%'
+		  	   		or t.cust_mgr_name like '%${enter_cust_mgr_id}%')
+		   </if>
+	</sql>
+	
+	<!-- 查询客户经理 分页 -->
+	<select id="queryCustMgrList" parameterType="map" resultType="map">
+		<include refid="common.pagingHead"/>
+		<include refid="listCustMgrSql"/>
+		<include refid="common.pagingEnd"/>
+	</select>
+	
+	<!-- 查询客户经理 总数 -->
+	<select id="queryCustMgrListTotalCount" parameterType="map" resultType="int">
+		<include refid="common.totalCountHead"/>
+		<include refid="listCustMgrSql"/>
+		<include refid="common.totalCountEnd"/>
+	</select>
+	
+</mapper>

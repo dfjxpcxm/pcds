@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       	http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.2.xsd"
+        >
+	<!-- *************************** 数据缓存与连接管理  ***********************************-->
+	 
+	<!-- 数据库连接缓存 -->
+	<bean id="dbConnCfgStore" class="com.shuhao.clean.apps.meta.databaseUtil.DbConnCfgStore" factory-method="getInstance">
+		<constructor-arg ref="dataSource"></constructor-arg>
+		<constructor-arg type="java.lang.String" value="数据库连接缓存 "/>
+	</bean>
+	
+	<!-- 数据库连接池工厂   lazy-init="false"-->
+	<bean id="jdbcFactory" class="com.shuhao.clean.apps.meta.databaseUtil.JdbcFactory" factory-method="init">
+		<constructor-arg ref="dbConnCfgStore"></constructor-arg>
+		<!-- 是否在初始化后测试连接
+		<constructor-arg type="java.lang.Boolean" value="true"></constructor-arg>
+		 -->
+	</bean>
+	
+	<!-- 缓存管家  -->
+	<bean id="storeManager" class="com.shuhao.clean.apps.meta.databaseUtil.StoreManager" factory-method="getInstance"></bean>
+	 
+</beans>

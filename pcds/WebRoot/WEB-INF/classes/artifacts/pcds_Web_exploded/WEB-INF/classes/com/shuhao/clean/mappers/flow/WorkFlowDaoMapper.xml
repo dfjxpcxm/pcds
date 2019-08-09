@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.shuhao.clean.apps.flow.dao.IWorkFlowDao">
+	
+	<sql id="getWorkFlowListSql">
+		select a.flow_tmpl_id ,a.flow_tmpl_name ,a.flow_tmpl_desc ,a.create_user_id,b.user_name create_user_name,
+		date_format(a.create_time ,'%Y-%m-%d') create_time
+		,a.update_user_id,c.user_name update_user_name,date_format(a.update_time,'%Y-%m-%d') update_time ,a.display_order ,a.status_cd , a.json_code 
+		from upp_flow_tmpl a left join opm_sys_user_info b on a.create_user_id = b.cust_mgr_id left join opm_sys_user_info c on a.update_user_id = c.cust_mgr_id
+			where  1=1 
+		<!-- 
+		<if test="flow_tmpl_name != ''">
+			and a.flow_tmpl_name like '%${flow_tmpl_name}%'
+		</if>
+		<if test="status_cd != ''">
+			and a.status_cd = #{status_cd}
+		</if>
+		 -->
+	</sql>
+	
+	<select id="getWorkFlowList" parameterType="map" resultType="map">
+		<include refid="common.pagingHead"/>
+		<include refid="getWorkFlowListSql"/>
+		<include refid="common.pagingEnd"/>
+	</select>
+	
+	<select id="getWorkFlowSize" parameterType="map" resultType="int">
+		select count(*) from (<include refid="getWorkFlowListSql"/>)
+	</select>
+	
+	<select id="getWorkFlowById" parameterType="map" resultType="map">
+		select * from upp_flow_tmpl a where a.flow_tmpl_id = #{flow_tmpl_id}
+	</select>
+	
+	<insert id="addWorkFlow" parameterType="map">
+		insert into upp_flow_tmpl (
+			flow_tmpl_id	, flow_tmpl_name , flow_tmpl_desc	, create_user_id ,
+			create_time	  	, status_cd	    , json_code) 
+			values ( 
+			#{flow_tmpl_id},#{flow_tmpl_name}, #{flow_tmpl_desc},#{create_user_id},
+			now(), #{status_cd},#{json_code} )
+	</insert>
+	
+	<update id="editWorkFlow" parameterType="map">
+		update upp_flow_tmpl set flow_tmpl_name = #{flow_tmpl_name},flow_tmpl_desc = #{flow_tmpl_desc},update_user_id = #{update_user_id},
+		update_time = now(),json_code = #{json_code} where flow_tmpl_id = #{flow_tmpl_id}
+	</update>
+	
+	
+	<!-- 删除和发布将支持批量 -->
+	
+	<delete id="delWorkFlow" parameterType="java.util.List">
+		delete from upp_flow_tmpl where flow_tmpl_id in
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<update id="pubWorkFlow" parameterType="java.util.List">
+		update upp_flow_tmpl set status_cd = 'Y' where flow_tmpl_id in 
+		<foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	<update id="rebPubWorkFlow" parameterType="java.util.List">
+		update upp_flow_tmpl set status_cd = 'N' where flow_tmpl_id in 
+		<foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	<!-- 检查流程是否被引用 -->
+	<select id="checkWorkFlow" parameterType="string" resultType="int">
+		select count(*) from upp_tmpl_flow t where t.flow_tmpl_id = #{flow_tmpl_id}
+	</select>
+	
+	<select id="getBankOrg" parameterType="map" resultType="map">
+		select t.bank_org_id nodeId,t.bank_org_name nodeName from dmd_bank_inter_org t where t.parent_bank_org_id = #{nodeId}
+	</select>
+	
+	<select id="getDeptInfo" parameterType="map" resultType="map">
+		select t.dept_id nodeId,t.detp_name nodeName from dmd_bank_org_dept t where t.parent_dept_id = #{nodeId}
+	</select>
+	
+	<!-- fms修改 -->
+	<select id="getUserRole"  resultType="map">
+		select t.uuid nodeId,t.role_name nodeName from sys_role_info t
+	</select>
+	
+	<select id="getPostInfo"  resultType="map">
+		select t.id nodeId, t.name nodeName from t_basedata t where t.category = 'adminDuty'
+	</select>
+	
+	<select id="getTeamInfo" resultType="map">
+		select t.mgr_team_id nodeId,t.mgr_team_name nodeName from dmd_mgr_team t
+	</select>
+	
+	<sql id="getUserInfoSql">
+		select t.cust_mgr_id nodeId,t.user_name nodeName from opm_sys_user_info t where 1=1
+		<if test="key != null and key != ''">
+			and (t.cust_mgr_id like '%${key}%' or t.user_name like '%${key}%')
+		</if>
+	</sql>
+	
+	<select id="getUserInfo"  resultType="map" parameterType="map">
+		<include refid="common.pagingHead"/>
+		<include refid="getUserInfoSql"/>
+		<include refid="common.pagingEnd"/>
+	</select>
+	
+	
+	<select id="getUserInfoCount"  resultType="int" parameterType="map">
+		select count(*) from (
+			<include refid="getUserInfoSql"/>
+		)
+	</select>
+	
+	
+	<select id="getCurrentUserRole"  resultType="map" parameterType="map">
+		select t.* from opm_sys_user_role t where t.user_id = #{user_id}
+	</select>
+	
+	
+	<!-- 获取流水信息 -->
+	<select id="getApproveSeqByNo" parameterType="map" resultType="map">
+		select t.* from upp_flow_sequences t where t.business_no = #{business_no}
+	</select>
+	
+	
+	<!-- 获取审批流水信息 -->
+	<select id="getApproveSeq" parameterType="map" resultType="map">
+		select t.* from upp_flow_sequences t where t.task_id = #{task_id}
+	</select>
+	
+	
+	<!-- 获取历史审批记录 -->
+	<select id="getApproveInfo" parameterType="map" resultType="map">
+		select a.task_id,a.approve_role,to_char(a.approve_date,'yyyy-mm-dd hh:mi:ss') approve_date,a.approve_info,a.approve_desc,b.user_name from upp_flow_approve_info a ,opm_sys_user_info b where a.approve_user = b.cust_mgr_id and a.task_id = #{task_id} order by a.approve_date asc
+	</select>
+	
+	
+	<!-- 新增审批流水信息,独立新增 -->
+	<insert id="addApproveSeq" parameterType="map">
+		insert into upp_flow_sequences
+		  (task_id,
+		   flow_id,
+		   current_node_id,
+		   next_node_id,
+		   create_user,
+		   create_date,
+		   task_status,
+		   business_no)
+		values
+		  (#{task_id},
+		   #{flow_id},
+		   #{current_node_id},
+		   #{next_node_id},
+		   #{create_user},
+		   now(),
+		   #{task_status},
+		   #{business_no})
+	</insert>
+	
+	<!-- 编辑审批信息，处理初始化 -->
+	<insert id="startApproveFlow" parameterType="map">
+		<![CDATA[
+			BEGIN
+				insert into upp_flow_approve_info(task_id,approve_user,approve_role,approve_date,approve_info,approve_desc) values (#{task_id},#{approve_user},#{approve_role},now(),#{approve_info},#{approve_desc});
+				update upp_flow_sequences t
+				   set t.current_node_id = #{current_node_id},
+				       t.next_node_id    = #{next_node_id},
+				       t.task_status     = #{task_status}
+				   where t.business_no = #{business_no};
+			END;
+		]]>
+	</insert>
+	
+	<!-- 新增审批信息 -->
+	<insert id="startApprove" parameterType="map">
+		<![CDATA[
+			BEGIN
+				insert into upp_flow_sequences(task_id,flow_id,current_node_id,next_node_id,create_user,create_date,task_status,business_no) values (#{task_id},#{flow_id},#{current_node_id},#{next_node_id},#{create_user},now(),'01',#{business_no});
+				insert into upp_flow_approve_info(task_id,approve_user,approve_role,approve_date,approve_info,approve_desc) values (#{task_id},#{approve_user},#{approve_role},now(),#{approve_info},#{approve_desc});
+			END;
+		]]>
+	</insert>
+	
+	<!-- 执行审批操作  -->
+	<select id="doApprove" parameterType="map">
+		<![CDATA[
+			BEGIN
+				update upp_flow_sequences set current_node_id = #{current_node_id},next_node_id = #{next_node_id},update_user = #{update_user},update_date=now(),task_status = #{task_status} where task_id=#{task_id};
+				insert into upp_flow_approve_info(task_id,approve_user,approve_role,approve_date,approve_info,approve_desc) values (#{task_id},#{approve_user},#{approve_role},now(),#{approve_info},#{approve_desc});
+			END;
+		]]>
+	</select>
+	
+	<!-- 删除审批流水 -->
+	<delete id="delApproveInfo" parameterType="map">
+		delete from upp_flow_approve_info where task_id in (select task_id from upp_flow_sequences where business_no = #{business_no})
+	</delete>
+	
+	<!-- 更新审批状态 -->
+	<update id="editFlowSeqInfo" parameterType="map">
+		 update upp_flow_sequences t
+		   set t.current_node_id = '-1',
+		       t.next_node_id    = '-1',
+		       t.task_status     = '-1'
+		   where t.business_no = #{business_no}
+	</update>
+	
+	<!-- 删除审批信息  -->
+	<delete id="delApprove" parameterType="map">
+		<![CDATA[
+			BEGIN
+				delete from upp_flow_sequences where task_id = #{task_id};
+				delete from upp_flow_approve_info where task_id = #{task_id};
+			END;
+		]]>
+	</delete>
+	
+	<!-- 按业务编号删除 -->
+	<delete id="delApproveByNo" parameterType="map">
+		<![CDATA[
+			
+				delete from upp_flow_approve_info where task_id in (select task_id from upp_flow_sequences where business_no = #{business_no});
+				delete from upp_flow_sequences where business_no = #{business_no};
+			
+		]]>
+	</delete>
+	
+	<!-- 判断是否是继续提交，去掉审批人不等当前用户的条件a.approve_user != #{current_user} and -->
+	<select id="checkUpd" parameterType="map" resultType="int">
+		select count(1) from upp_flow_approve_info a where  a.task_id = #{task_id}
+	</select>
+	
+	<!-- 删除审批信息 -->
+	<delete id="deleteApproveMsg" parameterType="map">
+		<![CDATA[
+			
+				delete from upp_flow_approve_info where task_id in (select task_id from upp_flow_sequences where business_no = #{business_no});
+				delete from upp_flow_sequences where business_no = #{business_no};
+			
+		]]>
+	</delete>
+</mapper>

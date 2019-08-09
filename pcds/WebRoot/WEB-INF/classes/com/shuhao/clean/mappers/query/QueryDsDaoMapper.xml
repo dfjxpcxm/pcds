@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shuhao.clean.apps.query.dao.QueryDsDao">
+
+	<select id="getDsList" resultType="QueryDs">
+		select 
+		t.ds_id,
+		t.p_ds_id,
+		t.ds_name,
+		t.ds_category,
+		case
+		   when a.ds_name is null then
+		    'Y'
+		   else
+		    'N'
+		 end is_leaf,
+		t.status 
+		from tool_cq_ds t
+		left join tool_cq_ds a on t.p_ds_id = a.ds_id
+		where 1=1
+		order by t.ds_id 
+	</select>
+	<!-- 查询数据源基本信息 -->
+	<select id="findDsById" parameterType="QueryDs" resultType="QueryDs">
+		select 
+		t.ds_id,
+		t.p_ds_id,
+		t.ds_name,
+		t.ds_category,
+		t.status 
+		from tool_cq_ds t
+		where t.ds_id =#{ds_id}
+	</select>
+	
+	<insert id="addDs" parameterType="QueryDs">
+		insert into tool_cq_ds(ds_id,
+			p_ds_id,
+			ds_name,
+			ds_category,
+			status)
+	    values(#{ds_id},
+			#{p_ds_id},
+			#{ds_name},
+			#{ds_category},
+			#{status})
+	</insert>
+	
+	<update id="updateDs" parameterType="QueryDs">
+		update tool_cq_ds 
+		set
+		p_ds_id = #{p_ds_id,jdbcType=VARCHAR},
+		ds_name = #{ds_name,jdbcType=VARCHAR},
+		ds_category = #{ds_category,jdbcType=CHAR},
+		status = #{status,jdbcType=CHAR},
+		ds_sql = #{ds_sql,jdbcType=CLOB}
+		where ds_id = #{ds_id,jdbcType=VARCHAR}
+	</update>
+	
+	<delete id="deleteDs" parameterType="QueryDs">
+		delete from tool_cq_ds where ds_id = #{ds_id}
+	</delete>
+	
+	<!-- 岗位 -->
+	<sql id="getPostSql">
+		select post_id as id_field,post_desc as value_field from sys_post_info
+	</sql>
+	<!-- 角色 -->
+	<sql id="getRoleSql">
+		select role_id as id_field,role_name as value_field from sys_role_info
+	</sql>
+	<select id="listByType" parameterType="map" resultType="map">
+		<if test="searchType==0">
+			<include refid="getPostSql"/>
+		</if>
+		<if test="searchType==1">
+			<include refid="getRoleSql"/>
+		</if>
+	</select>
+	
+	<!-- 查询用户列表 -->
+	<sql id="getUserSql">
+		select user_id, user_name
+		  from sys_user_info
+		 where user_id not in (select user_id from tool_cq_user_ds where ds_id = #{ds_id})
+		 <if test="sType==0 and typeValue !=null and typeValue != ''">
+		   and post_id = #{typeValue}
+		 </if>
+		 <if test="sType==1 and typeValue != null and typeValue != ''">
+		   and user_id in (select user_id from sys_user_role where role_uuid = #{typeValue})
+		 </if>
+	</sql>
+	<select id="getUserList" parameterType="map" resultType="map">
+	    <include refid="common.pagingHead"/>
+		<include refid="getUserSql"/>
+	    <include refid="common.pagingEnd"/>
+	</select>
+	<select id="getUserListCount" parameterType="map" resultType="int">
+	    select count(1) from (
+			<include refid="getUserSql"/>
+		)
+	</select>
+	
+	<select id="getAllotedUserList" parameterType="map" resultType="map">
+	    select user_id, user_name from sys_user_info
+		where user_id in (select user_id from tool_cq_user_ds where ds_id = #{ds_id})
+	</select>
+	
+	<insert id="addUserDs" parameterType="map">
+		insert into tool_cq_user_ds(ds_id,user_id) values(#{ds_id},#{user_id})
+	</insert>
+	
+	<delete id="deleteUserDs" parameterType="map">
+		delete from tool_cq_user_ds where ds_id = #{ds_id} and user_id = #{user_id}
+	</delete>
+	
+	<select id="getUserDsList" parameterType="map" resultType="QueryDs">
+		select 
+	    t.ds_id,
+	    t.p_ds_id,
+	    t.ds_name,
+	    t.ds_category,
+	    t.status 
+	    from tool_cq_ds t
+	     where 1=1 and t.ds_category = '0'
+	   union  
+	    select 
+	    t.ds_id,
+	    t.p_ds_id,
+	    t.ds_name,
+	    t.ds_category,
+	    t.status 
+	    from tool_cq_ds t,  tool_cq_user_ds a
+	    where 1=1
+	    and t.ds_id = a.ds_id
+	    and a.user_id = #{userId}
+	    and t.ds_category = '1'
+	    order by  ds_id 
+	</select>
+	
+	<!-- 查询数据源详细信息 -->
+	<select id="getDsInfo" parameterType="map" resultType="QueryDs">
+		select 
+		t.ds_id,
+		t.p_ds_id,
+		t.ds_name,
+		t.ds_category,
+		t.status,
+		t.ds_sql
+		from tool_cq_ds t
+		where 1=1 and t.ds_id =#{dsId}
+	</select>
+	
+	<select id="getDsDim" parameterType="map" resultType="map">
+		select s.dim_cd,
+			s.is_tree, 
+			s.code_col_name,
+			s.label_col_name
+		 from upp_dim_source s
+		 where s.dim_cd in (select dim_cd
+          from tool_cq_ds_meta
+         where ds_id = #{dsId}
+           and dim_cd is not null)
+	</select>
+	
+	<select id="deleteDsInfo" parameterType="QueryDs">
+		<![CDATA[
+			BEGIN
+				delete from tool_cq_ds where ds_id = #{ds_id};
+				delete from tool_cq_ds_meta where ds_id = #{ds_id};
+				delete from tool_cq_user_ds_cmeta where ds_id = #{ds_id};
+				delete from tool_cq_user_ds where ds_id = #{ds_id};
+			END;
+		]]>
+	</select>
+</mapper>

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 业务类型期限管理 -->
+<mapper namespace="com.shuhao.clean.apps.meta.dao.ManagerFnMdProDao">
+
+	<insert id="addFnMdPro" parameterType="UppFnMetadataProperty">
+		insert into upp_fn_metadata_property (
+			METADATA_ID,METADATA_NAME,BEGIN_CELL,END_CELL,STATUS_CODE,
+			COMPONENT_TYPE,DIM_CODE,COMPONENT_ID,COMPONENT_TAB,COMPONENT_NAME,
+			COMPONENT_DEFAULT,COMPONENT_LENGTH,COMPONENT_HIDE,component_query,
+			DISPLAY_ORDER,COM_CONDITION,DML_SQL,IF_EDITABLE,IF_MUST_INPUT,IF_PK,
+			MAX_VALUE,MIN_VALUE,COMPONENT_DESC,MAX_LENGTH,MIN_LENGTH,COL_BIZ_TYPE_CD
+		)values(
+			#{metadata_id,jdbcType=VARCHAR},
+			#{metadata_name,jdbcType=VARCHAR},
+			#{begin_cell,jdbcType=VARCHAR},
+			#{end_cell,jdbcType=VARCHAR},
+			#{status_code,jdbcType=VARCHAR},
+			#{component_type,jdbcType=VARCHAR},
+			#{dim_code,jdbcType=VARCHAR},
+			#{component_id,jdbcType=VARCHAR},
+			#{component_tab,jdbcType=VARCHAR},
+			#{component_name,jdbcType=VARCHAR},
+			#{component_default,jdbcType=VARCHAR},
+			#{component_length,jdbcType=VARCHAR},
+			#{component_hide,jdbcType=VARCHAR},
+			#{component_query,jdbcType=VARCHAR},
+			#{display_order,jdbcType=INTEGER},
+			#{com_condition,jdbcType=VARCHAR},
+			#{dml_sql,jdbcType=VARCHAR},
+			#{if_editable,jdbcType=VARCHAR},
+			#{if_must_input,jdbcType=VARCHAR},
+			#{if_pk,jdbcType=VARCHAR},
+			#{max_value,jdbcType=INTEGER},
+			#{min_value,jdbcType=INTEGER},
+			#{component_desc,jdbcType=VARCHAR},
+			#{max_length,jdbcType=INTEGER},
+			#{min_length,jdbcType=INTEGER},
+			#{col_biz_type_cd,jdbcType=VARCHAR}
+		)
+	</insert>
+	 
+	<delete id="deleteFnMdPro" parameterType="UppFnMetadataProperty">
+		delete from upp_fn_metadata_property where METADATA_ID = #{metadata_id}
+	</delete>
+	 
+	<delete id="deleteFnMdProByParent" parameterType="UppFnMetadataProperty">
+		delete from upp_fn_metadata_property 
+			where metadata_id in( 
+				select t.fn_metadata_id metadata_id from upp_dic_fn_rela t where t.dic_metadata_id=''
+			)
+	</delete>
+	 
+ 	<update id="updateFnMdPro" parameterType="UppFnMetadataProperty">
+	update upp_fn_metadata_property set 
+		METADATA_NAME=#{metadata_name,jdbcType=VARCHAR},
+		BEGIN_CELL=#{begin_cell,jdbcType=VARCHAR},
+		END_CELL=#{end_cell,jdbcType=VARCHAR},
+		STATUS_CODE=#{status_code,jdbcType=VARCHAR},
+		COMPONENT_TYPE=#{component_type,jdbcType=VARCHAR},
+		DIM_CODE=#{dim_code,jdbcType=VARCHAR},
+		COMPONENT_ID=#{component_id,jdbcType=VARCHAR},
+		COMPONENT_TAB=#{component_tab,jdbcType=VARCHAR},
+		COMPONENT_NAME=#{component_name,jdbcType=VARCHAR},
+		COMPONENT_DEFAULT=#{component_default,jdbcType=VARCHAR},
+		COMPONENT_LENGTH=#{component_length,jdbcType=VARCHAR},
+		COMPONENT_HIDE=#{component_hide,jdbcType=VARCHAR},
+		COMPONENT_QUERY=#{component_query,jdbcType=VARCHAR},
+		DISPLAY_ORDER=#{display_order,jdbcType=INTEGER},
+		COM_CONDITION=#{com_condition,jdbcType=VARCHAR},
+		DML_SQL=#{dml_sql,jdbcType=VARCHAR},
+		IF_EDITABLE = #{if_editable,jdbcType=VARCHAR},
+		IF_MUST_INPUT = #{if_must_input,jdbcType=VARCHAR},
+		IF_PK = #{if_pk,jdbcType=VARCHAR},
+		MAX_VALUE = #{max_value,jdbcType=INTEGER},
+		MIN_VALUE = #{min_value,jdbcType=INTEGER},
+		COMPONENT_DESC = #{component_desc,jdbcType=VARCHAR},
+		MAX_LENGTH = #{max_length,jdbcType=INTEGER},
+		MIN_LENGTH = #{min_length,jdbcType=INTEGER},
+		COL_BIZ_TYPE_CD = #{col_biz_type_cd,jdbcType=VARCHAR}
+		where  METADATA_ID=#{metadata_id,jdbcType=VARCHAR}
+	</update>
+	 <!-- 查询元数据属性sql-->
+	 <sql id='listFnMdProSql'>
+	 	select 
+			* 
+		from 
+			upp_fn_metadata_property 
+		where 
+			1=1 
+		<if test="metadata_id != null and metadata_id != ''">
+			and METADATA_ID = #{metadata_id}
+		</if>
+		<if test="searchKey != null and searchKey != ''">
+			and (upper(METADATA_ID) like upper('%${searchKey}%') or upper(METADATA_name) like upper('%${searchKey}%')) 
+		</if>
+		order by metadata_id
+	 </sql>
+	 <!-- 查询元数据属性分页-->
+	<select id="listFnMdProPage" parameterType="map" resultType="UppFnMetadataProperty">
+		<include refid="common.pagingHead"/>
+		<include refid="listFnMdProSql"/>
+		<include refid="common.pagingEnd"/>
+	</select>
+	<!-- 查询元数据属性总数-->
+	<select id="listFnMdProTotal" parameterType="map" resultType="int">
+		<include refid="common.totalCountHead"/>
+		<include refid="listFnMdProSql"/>
+		<include refid="common.totalCountEnd"/>
+	</select>
+	
+	<!-- 查询元数据属性总数-->
+	<select id="listBizType" parameterType="map" resultType="map">
+		select u.col_biz_type_cd,u.col_biz_type_desc
+		  from upp_col_biz_type u
+		 where u.upp_rela_id =
+		       (select t.prt_metadata_id
+		          from upp_metadata t, upp_dic_fn_rela a
+		         where t.metadata_id = a.db_obj_id
+		           and a.metadata_id = #{field_id})
+		    or u.upp_rela_id = 'public_table'
+		    order by u.display_order
+	</select>
+	
+	<!-- 查询字段列表-->
+	<select id="fnColumns" parameterType="map" resultType="map">
+		select b.metadata_name, b.metadata_id,b.component_tab,b.display_order from upp_metadata a
+      	   left join upp_fn_metadata_property b on a.metadata_id=b.metadata_id
+	       where metadata_cate_code = '2010101' 
+	       and parent_metadata_id = (
+	           select parent_metadata_id from upp_metadata where metadata_id =#{metadata_id}
+	       )
+	       order by b.display_order,a.display_order
+	</select>
+	<!-- 更新字段顺序-->
+	<update id="updateDisOrder" parameterType="map" >
+		update upp_fn_metadata_property set display_order = #{display_order,jdbcType=INTEGER} 
+		where metadata_id= #{metadata_id}
+	</update>
+</mapper>
