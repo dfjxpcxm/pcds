@@ -44,7 +44,7 @@
 	
 	<!-- 删除主题 -->
 	<delete id="deleteTheme" parameterType="string">
-		delete from upp_biz_theme a where a.theme_id = #{theme_id}
+		delete from upp_biz_theme where theme_id = #{theme_id}
 	</delete>
 	
 </mapper>

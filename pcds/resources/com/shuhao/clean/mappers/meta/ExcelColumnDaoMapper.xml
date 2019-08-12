@@ -99,7 +99,7 @@
 	
 	<!-- 删除Excel列对象 -->
 	<delete id="deleteExcelColumn" parameterType="string">
-		delete from upp_xls_column a where a.xls_col_id = #{column_id}
+		delete from upp_xls_column where xls_col_id = #{column_id}
 	</delete>
 	
 	<!-- 根据sheet id查询Excel列列表 -->

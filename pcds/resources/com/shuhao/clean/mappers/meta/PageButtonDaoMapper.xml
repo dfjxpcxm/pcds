@@ -59,12 +59,12 @@
 	
 	<!-- 删除页面结构对象 -->
 	<delete id="deletePageButton" parameterType="string">
-		delete from upp_page_button a where a.button_id = #{button_id}
+		delete from upp_page_button where button_id = #{button_id}
 	</delete>
 	
 	<!-- 批量删除页面按钮对象 -->
 	<delete id="deletePageButtonBatch" parameterType="map">
-		delete from upp_page_button a where a.button_id in (${del_para_str})
+		delete from upp_page_button where button_id in (${del_para_str})
 	</delete>
 	
 	<!-- 查询关联元数据-->

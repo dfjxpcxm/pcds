@@ -46,7 +46,7 @@
 	
 	<!-- 删除用户 -->
 	<delete id="deleteUser" parameterType="string">
-		delete from upp_user a where a.user_id = #{user_id}
+		delete from upp_user  where user_id = #{user_id}
 	</delete>
 	
 </mapper>

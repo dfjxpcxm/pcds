@@ -22,7 +22,7 @@
 	</insert>
 	
 	<delete id="removeTheme" parameterType="UppTheme">
-		delete from upp_theme a where a.theme_id=#{theme_id}
+		delete from upp_theme where theme_id=#{theme_id}
 	</delete>
 	
 	<update id="updateTheme" parameterType="UppTheme">

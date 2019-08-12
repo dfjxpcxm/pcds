@@ -67,11 +67,11 @@
 	</insert>
 	
 	<delete id="deleteCheckRule" parameterType="UppCheckRule">
-		 delete from upp_chk_rule t where t.chk_rule_cd=#{chk_rule_code}
+		 delete from upp_chk_rule where chk_rule_cd=#{chk_rule_code}
 	</delete>
 	
 	<delete id="deleteMetaRule" parameterType="UppCheckRule">
-		 delete from upp_chk_metadata_rule t where t.metadata_id=#{metadata_id} and t.chk_rule_cd = #{chk_rule_code}
+		 delete from upp_chk_metadata_rule where metadata_id=#{metadata_id} and chk_rule_cd = #{chk_rule_code}
 	</delete>
 	
 	<update id="updateCheckRule" parameterType="UppCheckRule">

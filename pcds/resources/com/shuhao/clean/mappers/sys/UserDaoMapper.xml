@@ -209,7 +209,7 @@
 		where 
 			user_id = #{user_id} -->
 		delete from 
-			opm_sys_user_role a
+			opm_sys_user_role
 		where 
 			user_id = #{user_id}
 		<!-- 
@@ -359,7 +359,7 @@
 	
 	
 	<delete id="deleteRoleByUserIdAndBankOrgId" parameterType="map">
-		delete from 
+		delete a from
 			opm_sys_user_role a
 		where
 			a.user_id = #{user_id}

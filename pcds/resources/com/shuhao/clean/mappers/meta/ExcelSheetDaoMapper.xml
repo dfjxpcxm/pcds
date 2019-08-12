@@ -68,7 +68,7 @@
 	
 	<!-- 删除sheet页对象 -->
 	<delete id="deleteSheet" parameterType="string">
-		delete from upp_xls_sheet a where a.sheet_id = #{sheet_id}
+		delete from upp_xls_sheet where sheet_id = #{sheet_id}
 	</delete>
 	
 	<!-- 根据Excel id查询sheet页列表 -->

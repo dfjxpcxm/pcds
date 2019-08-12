@@ -95,7 +95,7 @@
 	
 	<!-- 根据表id删除表下面的所有列 -->
 	<delete id="deleteColumnByTableId" parameterType="string">
-		delete from upp_column a where exists (
+		delete a from upp_column a where exists (
 			select 1 from upp_metadata m 
 			where a.column_id = m.metadata_id
 				and m.prt_metadata_id = #{table_id}

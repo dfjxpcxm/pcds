@@ -41,12 +41,12 @@
 	
 	<!-- 删除表对象 -->
 	<delete id="deleteTable" parameterType="string">
-		delete from upp_table a where a.table_id = #{table_id}
+		delete from upp_table where table_id = #{table_id}
 	</delete>
 	
 	<!-- 删除表关联的类型 -->
 	<delete id="deleteTableColType" parameterType="string">
-		delete from upp_col_biz_type t where t.upp_rela_id = #{table_id}
+		delete from upp_col_biz_type where upp_rela_id = #{table_id}
 	</delete>
 	
 </mapper>

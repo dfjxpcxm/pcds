@@ -36,7 +36,7 @@
 	
 	<!-- 删除页面事件 -->
 	<delete id="deletePageEvent" parameterType="map">
-		 delete from upp_page_event t where t.file_id=#{file_id}
+		 delete from upp_page_event where file_id=#{file_id}
 	</delete>
 	
 	<!-- 查询页面事件sql -->

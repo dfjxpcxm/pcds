@@ -37,7 +37,7 @@
 	
 	<!-- 删除标的列字段信息 -->
 	<delete id="deleteExcel" parameterType="string">
-		delete from upp_xls_book a where a.excel_id = #{excel_id}
+		delete from upp_xls_book  where excel_id = #{excel_id}
 	</delete>
 	
 </mapper>

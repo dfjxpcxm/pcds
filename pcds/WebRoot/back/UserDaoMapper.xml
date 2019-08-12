@@ -306,7 +306,7 @@
 	</select>
 	
 	<delete id="deleteSpeciallyAuthorize" parameterType="map">
-		delete from
+		delete a from
 			bsc_user_spec_priv a
 		where
 			a.user_id = #{user_id}
@@ -336,7 +336,7 @@
 	
 	
 	<delete id="deleteRoleByUserIdAndBankOrgId" parameterType="map">
-		delete from 
+		delete a from
 			opm_sys_user_role a
 		where
 			a.user_id = #{user_id}
