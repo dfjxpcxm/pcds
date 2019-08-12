@@ -41,7 +41,6 @@
 			a.database_desc,
 			a.server_addr,
 			a.connect_str,
-			a.char_encoding,
 			a.access_port,
 			a.test_user_name,
 			a.test_user_password

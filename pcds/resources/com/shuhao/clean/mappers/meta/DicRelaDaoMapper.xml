@@ -29,7 +29,7 @@
 	
 	<!-- 根据上级字典元数据id删除关系表记录 -->
 	<delete id="deleteRelaByParentDbId" parameterType="string">
-		delete a from upp_dic_fn_rela a where exists (
+		delete from upp_dic_fn_rela a where exists (
 			select 1 from upp_metadata b 
 			where a.metadata_id = b.metadata_id
 				and b.prt_metadata_id = #{parent_db_id}

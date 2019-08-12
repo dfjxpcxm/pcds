@@ -126,7 +126,7 @@
 			#{md_cate_cd},
 			#{status_cd},
 			#{is_display},
-		 	#{display_order jdbcType=INTEGER},
+		 #{display_order jdbcType=INTEGER},
 			<!-- #{display_order jdbcType=VARCHAR}, -->
 			#{create_user_id},
 			now(),
@@ -173,7 +173,7 @@
 	
 	<!-- 根据上级元数据id删除下级元数据记录 -->
 	<delete id="deleteMetadataByParentId" parameterType="string">
-		delete from upp_metadata  where  metadata_id = #{parent_metadata_id}
+		delete from upp_metadata  where  prt_metadata_id = #{parent_metadata_id}
 	</delete>
 	
 	<!-- 是否有下级元数据 -->

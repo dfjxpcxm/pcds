@@ -79,10 +79,10 @@ public interface MetadataDao {
 	
 	/**
 	 * 根据上级元数据id删除下级元数据记录
-	 * @param table_id
+	 * @param parent_metadata_id
 	 * @throws Exception
 	 */
-	public void deleteMetadataByParentId(String table_id) throws Exception;
+	public void deleteMetadataByParentId(String parent_metadata_id) throws Exception;
 	
 	
 	/**

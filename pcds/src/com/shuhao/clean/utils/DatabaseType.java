@@ -199,7 +199,7 @@ public enum DatabaseType {
 			sql.append("from information_schema.tables a ");
 			//sql.append("where a.table_name = b.table_name ");
 			if(searchKey != null) {
-				sql.append("where a.table_name like '%").append(searchKey.toUpperCase()).append("%' ");
+				sql.append("and a.table_name like '%").append(searchKey.toUpperCase()).append("%' ");
 			}
 			sql.append("order by a.table_name ");
 			return sql.toString();
