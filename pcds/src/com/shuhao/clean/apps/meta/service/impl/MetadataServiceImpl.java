@@ -128,17 +128,17 @@ public class MetadataServiceImpl extends BaseService implements IMetadataService
 	
 	/**
 	 * 根据上级元数据id删除下级元数据记录
-	 * @param parent_metadata_id
+	 * @param table_id
 	 * @throws Exception
 	 */
-	public void deleteMetadataByParentId(String parent_metadata_id) throws Exception {
-		this.metadataDao.deleteMetadataByParentId(parent_metadata_id);
+	public void deleteMetadataByParentId(String table_id) throws Exception {
+		this.metadataDao.deleteMetadataByParentId(table_id);
 	}
 	
 	/**
 	 * 查询引用元数据
 	 * 
-	 * @param parent_metadata_id
+	 * @param metadata_id
 	 * @return
 	 * @throws Exception
 	 */

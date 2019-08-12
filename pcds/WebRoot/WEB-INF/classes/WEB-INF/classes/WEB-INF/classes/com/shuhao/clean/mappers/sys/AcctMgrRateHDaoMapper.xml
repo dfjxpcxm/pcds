@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 账户分配 -->
+<mapper namespace="com.shuhao.clean.apps.base.dao.AcctMgrRateHDao">
+	
+	<!-- 查询 账户分配关系-->
+	<select id="queryAcctMgrRateH" parameterType="map" resultType="map">
+		select 
+			a.cust_mgr_id,
+			b.cust_mgr_name,
+			a.alloc_rate alloc_rate 
+		from imp_acct_mgr_rate_h a ,dmd_cust_mgr b
+		where a.acct_id = '${acct_id}'
+			and a.cust_mgr_id = b.cust_mgr_id
+		order by a.alloc_rate desc
+	</select>
+	
+	<!-- 批量新增账户分配关系  -->
+	<insert id="addAcctMgrRateH" parameterType="java.util.List" >
+		insert into imp_acct_mgr_rate_h
+		( 
+		  acct_id, 
+		  cust_mgr_id, 
+		  begin_date, 
+          alloc_rate, 
+		  business_no
+		) 
+		select a.* from (
+			<foreach collection="list" item="item" index="index" separator="union">
+				 select 
+					'${item.acct_id}',
+					'${item.cust_mgr_id}', 
+					str_to_date('${item.begin_date}','%Y-%m-%d') ,
+					'${item.alloc_rate}',
+					'${item.business_no}'
+				from dual
+			</foreach>
+		) a
+	</insert>
+	
+	<!-- 删除账户分配关系 -->
+	<delete id="deleteAcctMgrRateH" parameterType="map">
+		delete 
+		from imp_acct_mgr_rate_h 
+		where acct_id = '${acct_id}'
+	</delete>
+
+</mapper>

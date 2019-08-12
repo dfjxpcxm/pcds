@@ -78,10 +78,10 @@ public interface IMetadataService {
 	
 	/**
 	 * 根据上级元数据id删除下级元数据记录
-	 * @param parent_metadata_id
+	 * @param table_id
 	 * @throws Exception
 	 */
-	public void deleteMetadataByParentId(String parent_metadata_id) throws Exception;
+	public void deleteMetadataByParentId(String table_id) throws Exception;
 	
 	/**
 	 * 查询引用元数据

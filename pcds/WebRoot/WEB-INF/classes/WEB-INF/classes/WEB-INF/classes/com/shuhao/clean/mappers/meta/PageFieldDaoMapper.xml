@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.shuhao.clean.apps.meta.dao.PageFieldDao">
+	
+	<!-- 添加页面字段对象 -->
+	<insert id="addPageField" parameterType="UppPageField">
+		insert into upp_page_field (
+			field_id, 
+			field_name, 
+			component_label, 
+			component_type_id, 
+			dim_cd, 
+			default_value, 
+			col_biz_type_cd, 
+			is_hidden, 
+			display_order, 
+			is_editable, 
+			is_must_input, 
+			is_pk, 
+			max_value, 
+			min_value, 
+			max_length, 
+			is_query_cond
+		) values (
+			#{field_id,jdbcType=VARCHAR}, 
+			#{field_name,jdbcType=VARCHAR}, 
+			#{component_label,jdbcType=VARCHAR}, 
+			#{component_type_id,jdbcType=VARCHAR}, 
+			#{dim_cd,jdbcType=VARCHAR}, 
+			#{default_value,jdbcType=VARCHAR}, 
+			#{col_biz_type_cd,jdbcType=VARCHAR}, 
+			#{is_hidden,jdbcType=VARCHAR}, 
+			#{display_order,jdbcType=VARCHAR}, 
+			#{is_editable,jdbcType=VARCHAR}, 
+			#{is_must_input,jdbcType=VARCHAR}, 
+			#{is_pk,jdbcType=VARCHAR}, 
+			#{max_value,jdbcType=VARCHAR}, 
+			#{min_value,jdbcType=VARCHAR}, 
+			#{max_length,jdbcType=VARCHAR}, 
+			#{is_query_cond,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<!-- 根据id获取页面字段对象 -->
+	<select id="getPageFieldById" parameterType="string" resultType="UppPageField">
+		select 
+			a.field_id, 
+			a.field_name, 
+			a.component_label, 
+			a.component_type_id, 
+			a.dim_cd, 
+			a.default_value, 
+			a.col_biz_type_cd, 
+			a.is_hidden, 
+			a.display_order, 
+			a.is_editable, 
+			a.is_must_input, 
+			a.is_pk, 
+			a.max_value, 
+			a.min_value, 
+			a.max_length, 
+			a.is_query_cond,
+			b.db_obj_id rela_table_column
+		from upp_page_field a
+		left join upp_dic_fn_rela b
+			 on a.field_id = b.metadata_id
+		where a.field_id = #{field_id,jdbcType=VARCHAR}
+	</select>
+	
+	<!-- 根据字段列表id获取页面字段对象 -->
+	<select id="getResultsByFieldListId" parameterType="string" resultType="map">
+		select 
+			a.field_id, 
+			a.field_name, 
+			a.component_label, 
+			a.component_type_id, 
+			a.dim_cd, 
+			a.default_value, 
+			a.col_biz_type_cd, 
+			a.is_hidden, 
+			a.display_order, 
+			a.is_editable, 
+			a.is_must_input, 
+			a.is_pk, 
+			a.max_value, 
+			a.min_value, 
+			a.max_length, 
+			a.is_query_cond,
+			b.dim_name,
+			c.col_biz_type_desc,
+			case 
+				when a.component_type_id = 'hidden' 
+            then 99 + a.display_order
+                else a.display_order 
+            end  type_order
+		from upp_page_field a
+		left join upp_dim_source b on a.dim_cd = b.dim_cd
+		left join upp_col_biz_type c on a.col_biz_type_cd = c.col_biz_type_cd
+		where a.field_id in(
+				select t.metadata_id from upp_metadata t 
+			    where t.prt_metadata_id = #{field_list_id,jdbcType=VARCHAR} and t.md_cate_cd = 'FLD'
+			 )
+		order by type_order	 
+	</select>
+	
+	<!-- 保存页面字段对象 -->
+	<update id="savePageField" parameterType="UppPageField">
+		update 
+			upp_page_field a
+		set
+			a.field_name = #{field_name,jdbcType=VARCHAR}, 
+			a.component_label = #{component_label,jdbcType=VARCHAR}, 
+			a.component_type_id = #{component_type_id,jdbcType=VARCHAR}, 
+			a.dim_cd = #{dim_cd,jdbcType=VARCHAR}, 
+			a.default_value = #{default_value,jdbcType=VARCHAR}, 
+			a.col_biz_type_cd = #{col_biz_type_cd,jdbcType=VARCHAR}, 
+			a.is_hidden = #{is_hidden,jdbcType=VARCHAR}, 
+			a.display_order = #{display_order,jdbcType=VARCHAR}, 
+			a.is_editable = #{is_editable,jdbcType=VARCHAR}, 
+			a.is_must_input = #{is_must_input,jdbcType=VARCHAR}, 
+			a.is_pk = #{is_pk,jdbcType=VARCHAR},       
+			a.max_value = #{max_value,jdbcType=VARCHAR},   
+			a.min_value = #{min_value,jdbcType=VARCHAR},   
+			a.max_length = #{max_length,jdbcType=VARCHAR},  
+			a.is_query_cond = #{is_query_cond,jdbcType=VARCHAR}
+		where a.field_id = #{field_id,jdbcType=VARCHAR}
+	</update>
+	
+	<!-- 删除页面字段对象 -->
+	<delete id="deletePageField" parameterType="string">
+		delete from upp_page_field  where field_id = #{field_id,jdbcType=VARCHAR}
+	</delete>
+	
+	<!-- 批量删除页面字段对象 -->
+	<delete id="deletePageFieldBatch" parameterType="map">
+		delete from upp_page_field  where field_id in (${del_para_str})
+	</delete>
+	
+	<!-- 删除字段列表下所有页面字段 -->
+	<delete id="deletePageFieldByFieldListId" parameterType="string">
+		delete from upp_page_field  
+		where field_id in (
+			select metadata_id from upp_metadata b
+			where  b.prt_metadata_id = #{fieldListId,jdbcType=VARCHAR}
+		) 
+	</delete>
+	
+	<!-- 按字段列表ID获取字段顺序列表 -->
+	<select id="getFieldsForDisOrder" parameterType="map" resultType="map">
+		select 
+			a.field_id,
+			a.field_name,
+			a.component_label,
+			a.display_order,
+			case 
+        	    when a.component_type_id = 'hidden' 
+            then 99 + a.display_order
+                else a.display_order 
+            end  type_order
+		from upp_page_field a,
+			 upp_metadata b
+		where a.field_id = b.metadata_id
+		  and b.prt_metadata_id = #{prt_metadata_id,jdbcType=VARCHAR}
+		  and b.md_cate_cd ='FLD'
+		order by type_order
+	</select>  
+	
+	<!-- 按页面Id查询字段顺序列表 -->
+	<select id="getFieldsToOrderByPageId" parameterType="map" resultType="map">
+		select a.field_id, 
+		    a.field_name, 
+		    a.component_label, 
+		    a.display_order,
+		    case 
+        	    when a.component_type_id = 'hidden' 
+            then 99 + a.display_order
+                else a.display_order 
+            end  type_order
+		from upp_page_field a, 
+		  upp_metadata b,
+		  upp_metadata c
+		 where a.field_id = b.metadata_id
+		   and b.prt_metadata_id = c.metadata_id
+		   and b.md_cate_cd = 'FLD'
+		   and c.prt_metadata_id = #{page_id,jdbcType=VARCHAR}
+		   and c.md_cate_cd='FDL'
+		   and a.component_type_id != 'hidden'
+		 order by type_order
+	</select>  
+	
+	<!--  更新排序 -->
+	<update id="updateDisOrder" parameterType="map">
+		update upp_page_field a
+		set a.display_order = #{display_order,jdbcType=VARCHAR}
+		where a.field_id = #{field_id,jdbcType=VARCHAR}
+	</update>
+	
+	<!-- 保存元数据信息 -->
+	<update id="saveMetadata" parameterType="map">
+		update 
+			upp_metadata a
+		set
+			a.update_user_id = #{user_id},
+			a.display_order = #{display_order},
+			a.update_time = now()
+		where a.metadata_id = #{metadata_id}
+	</update>
+	
+	<!--  查询关联表的可配置字段 -->
+	<select id="queryRelaTableCols" parameterType="map" resultType="map">
+		select a.column_id,
+		       substr(a.column_name || ' ' || a.column_desc,1,length(a.column_name)+10) column_name
+		  from upp_column a
+		 where 1 = 1
+		   and a.column_id in
+		       (select b.metadata_id
+		          from upp_metadata b
+		         where b.prt_metadata_id = #{rela_table_id,jdbcType=VARCHAR})
+		   and a.column_id not in
+		       (select c.db_obj_id
+		          from upp_dic_fn_rela c
+		         where c.metadata_id in (select d.metadata_id
+		                                   from upp_metadata d
+		                                  where d.prt_metadata_id = #{field_list_id,jdbcType=VARCHAR}
+		                                 ))
+		 union all
+		 select m.column_id,
+		        m.column_name || ' ' || m.column_desc column_name
+		 from upp_column m,upp_dic_fn_rela n
+		 
+		 where m.column_id = n.db_obj_id
+		 	and n.metadata_id = #{field_id,jdbcType=VARCHAR}
+		 
+	</select>  
+	
+	<!--  根据字段列表ID 获取所属页面关联表-->
+	<select id="queryRelaTbColByFldLst" parameterType="map" resultType="map">
+		select b.db_obj_id rela_table_id
+	  	  from upp_metadata a, 
+	  	       upp_dic_fn_rela b
+	     where a.metadata_id = (select c.prt_metadata_id
+	                              from upp_metadata c
+	                             where c.metadata_id = #{field_list_id,jdbcType=VARCHAR})
+	   and a.metadata_id = b.metadata_id
+	</select>
+	
+	<!--  根据字段ID 获取字段列表ID-->
+	<select id="queryPrtByFieldId" parameterType="map" resultType="map">
+		select c.prt_metadata_id field_list_id
+          from upp_metadata c
+         where c.metadata_id = #{field_id,jdbcType=VARCHAR}
+	</select>  
+</mapper>
