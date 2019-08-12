@@ -183,7 +183,6 @@ ManageOrgSelector = function(bankOrgId) {
 		}]),
 		remoteSort : false
 	});
-
 	store.on('load', changeSelect);
 	store.load({params:{bank_org_id:bankOrgId}});
 
@@ -1083,8 +1082,7 @@ UppDimSourceSelector = function(config){
 		remoteSort : false
 	   });
 	store.on('load',changeSelect);
-//	store.load();
-	
+	store.load();
 	UppDimSourceSelector.superclass.constructor.call(this,{
 		id : id,
 		hiddenName : hiddenName,
@@ -1107,15 +1105,15 @@ UppDimSourceSelector = function(config){
 				is_tree : is_tree
 			}
 		})
-	},
+	};
 	
 	function changeSelect(){
 		
-		/*if(store.getCount()>0){
+		if(store.getCount()>0){
 			var combo = Ext.getCmp(id);
 			var value = store.getAt(0).get("dim_cd");
 			combo.setValue(value);
-		}*/
+		}
 	}
 }
 Ext.extend(UppDimSourceSelector,Ext.form.ComboBox);

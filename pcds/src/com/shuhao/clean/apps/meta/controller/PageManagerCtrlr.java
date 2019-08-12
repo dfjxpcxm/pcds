@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.net.MalformedURLException;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -630,7 +631,7 @@ public class PageManagerCtrlr extends BaseCtrlr {
 	 * @return
 	 * @throws DocumentException
 	 */
-	public Document XmlHandler() throws DocumentException{
+	public Document XmlHandler() throws DocumentException, MalformedURLException {
 		File file = new File(this.getClass().getClassLoader().getResource("").getPath()+ File.separator + "xmls" + File.separator + "ExcelTmpl.xml");
 		SAXReader reader = new SAXReader();
 		Document document = reader.read(file);
@@ -643,7 +644,7 @@ public class PageManagerCtrlr extends BaseCtrlr {
 	 * @return
 	 * @throws DocumentException
 	 */
-	public boolean hasXmlDom(String templateId)throws DocumentException{
+	public boolean hasXmlDom(String templateId) throws DocumentException, MalformedURLException {
 		return XmlHandler().selectNodes("/templates/template[@id='"+templateId+"']").size() > 0;
 	}
 	
@@ -1343,7 +1344,7 @@ public class PageManagerCtrlr extends BaseCtrlr {
 	 * @return
 	 * @throws DocumentException
 	 */
-	public Document XmlHandler(String templateId) throws DocumentException{
+	public Document XmlHandler(String templateId) throws DocumentException, MalformedURLException {
 		File file = new File(PageManagerCtrlr.class.getClassLoader().getResource("").getPath()+ File.separator + "xmls" + File.separator + "ExcelTmpl.xml");
 		SAXReader reader = new SAXReader();
 		Document document = reader.read(file);
@@ -1357,7 +1358,7 @@ public class PageManagerCtrlr extends BaseCtrlr {
 	 * @return
 	 * @throws DocumentException
 	 */
-	public  Map<String,String> executeHandler(String templateId,String name) throws DocumentException{
+	public  Map<String,String> executeHandler(String templateId,String name) throws DocumentException, MalformedURLException {
 		Map<String, String> result = new HashMap<String, String>();
 		Document document = XmlHandler(templateId);
 		List list = document.selectNodes("/templates/template[@id='"+templateId+"']/excels/excel/sheet[@name='"+name+"']");
