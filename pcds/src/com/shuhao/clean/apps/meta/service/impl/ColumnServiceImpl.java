@@ -38,6 +38,9 @@ public class ColumnServiceImpl implements IColumnService {
 	 */
 	public void addColumn(UppTableColumn column) throws Exception {
 		this.metadataService.addMetadata(column);
+		if(null ==column.getData_scale() || column.getData_scale().equals("")){
+			column.setData_scale("0");
+		}
 		this.columnDao.addColumn(column);
 	}
 	

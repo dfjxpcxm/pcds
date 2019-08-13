@@ -1,8 +1,10 @@
 package com.shuhao.clean.apps.meta.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.shuhao.clean.annotation.MyBatisDao;
+import com.shuhao.clean.apps.meta.entity.DbColumn;
 
 /**
  * 
@@ -20,5 +22,9 @@ public interface AlterTableDao {
 	 * @throws Exception
 	 */
 	public List<String> queryAllowParentList(String[] categoryArray) throws Exception;
+
+
+
+	public List<Map> getColumnInfo(DbColumn dbColumn) throws Exception;
 	
 }

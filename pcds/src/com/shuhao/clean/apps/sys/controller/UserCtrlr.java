@@ -313,7 +313,6 @@ public class UserCtrlr extends  BaseCtrlr {
 			//菜单源码
 			ResourcesUtils utils = new ResourcesUtils();
 			String jsResource = utils.getBaseMenuResource(treeStore);
-			
 			StringBuffer buffer = new StringBuffer();
 			for (int i = 0; i < utils.FUNC_LIST.size(); i++) {
 				if(i == utils.FUNC_LIST.size()-1){

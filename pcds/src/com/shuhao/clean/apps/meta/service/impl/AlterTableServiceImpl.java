@@ -118,7 +118,6 @@ public class AlterTableServiceImpl implements IAlterTableService {
 		UppDatabase database = this.databaseService.getDatabaseById(database_id);
 		final UppUser user = this.userService.getUserById(owner_id);
 		final UppTable table = this.tableService.getTableById(table_id);
-		
 		String url = database.getConnect_str();
 		String username = user.getUser_name();
 		String password = user.getUser_password();
@@ -165,23 +164,20 @@ public class AlterTableServiceImpl implements IAlterTableService {
 		//获取数据库连接
 		UppDatabase database = this.databaseService.getDatabaseById(dbColumn.getDatabase_id());
 		final UppUser user = this.userService.getUserById(dbColumn.getOwner_id());
-		
 		String url = database.getConnect_str();
 		String username = user.getUser_name();
 		String password = user.getUser_password();
-		
 		final DatabaseType dbType = DatabaseType.getValue(database.getDatabase_type_cd());
 		Connection conn = dbType.getDBConnection(url, username, password);
 		//查询是否已有列
 		final String isExistsSql = dbType.queryColumnExistsSql();
 		final String[] addSqls = dbType.addColumnSqls(dbColumn);
-		
 		try {
-
 			PreparedStatement ps = conn.prepareStatement(isExistsSql);
-			ps.setString(1, user.getUser_name());
-			ps.setString(2, dbColumn.getTable_name());
-			ps.setString(3, dbColumn.getColumn_name());
+//			ps.setString(1, user.getUser_name());
+
+			ps.setString(1, dbColumn.getTable_name());
+			ps.setString(2, dbColumn.getColumn_name());
 			ResultSet rs = ps.executeQuery();
 			rs.next();
 			int count = rs.getInt("col_count");
@@ -199,6 +195,7 @@ public class AlterTableServiceImpl implements IAlterTableService {
 			//提交事物
 			conn.commit();
 		} catch (Exception e) {
+			e.printStackTrace();
 			conn.rollback();
 			throw e;
 		} finally {
@@ -223,7 +220,13 @@ public class AlterTableServiceImpl implements IAlterTableService {
 		
 		final DatabaseType dbType = DatabaseType.getValue(database.getDatabase_type_cd());
 		Connection conn = dbType.getDBConnection(url, username, password);
-		
+
+		List<Map> retList = this.alterTableDao.getColumnInfo(dbColumn);
+		if(null !=retList && retList.size()>0){
+			Map mp = retList.get(0);
+			dbColumn.setData_type_cd(mp.get("data_type_cd").toString());
+			dbColumn.setData_length(mp.get("data_length").toString());
+		}
 		//修改sql
 		String[] alterSqls = dbType.updateColumnSqls(dbColumn);
 		try {

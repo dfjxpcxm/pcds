@@ -65,7 +65,6 @@ public class RoleCtrlr extends BaseCtrlr {
 	@ResponseBody
 	public Map<String, Object> add(SysRoleInfo sysRoleInfo) {
 		try {
-			//SysRoleInfo role = getParamObject(SysRoleInfo.class);
 			roleService.addRole(sysRoleInfo);
 			return doSuccessInfoResponse("添加成功");
 		} catch (Exception e) {

@@ -323,7 +323,7 @@ public class PageManagerServiceImpl extends BaseJdbcService implements IPageMana
 		
 		String business_no = "";
 		//业务编号
-		if(biz_date!=null&&!"".equals(biz_date)){
+		if(biz_date!= null &&!"".equals(biz_date) && !"null".equals(biz_date)){
 			business_no = biz_date.replace("-", "") + finance_org_id + curr_cd + acct_prod_id + UID.nt()+ UID.getShortSeq();
 		}else{
 			business_no = UID.next("BU");

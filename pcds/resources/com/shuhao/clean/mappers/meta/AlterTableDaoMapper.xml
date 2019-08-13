@@ -14,4 +14,19 @@
 			#{md_cate_cd}
 		</foreach>
 	</select>
+
+
+
+
+	<select id="getColumnInfo" parameterType="com.shuhao.clean.apps.meta.entity.DbColumn" resultType="map">
+			select case when data_type = 'VARCHAR' or data_type = 'CHAR' then '01'
+					when data_type = 'DECIMAL' then '02'
+					when data_type = 'DATETIME' then '03'
+					else ''
+					end as data_type_cd,
+				character_octet_length as data_length
+			from INFORMATION_SCHEMA.COLUMNS
+			where table_name=#{table_name}
+			and column_name=#{column_name}
+	</select>
 </mapper>

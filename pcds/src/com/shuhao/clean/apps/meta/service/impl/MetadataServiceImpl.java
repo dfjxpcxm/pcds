@@ -104,7 +104,6 @@ public class MetadataServiceImpl extends BaseService implements IMetadataService
 			if(this.metadataDao.hasSubMeta(metadata_ids[i])) {
 				throw new IllegalArgumentException("元数据包含下级元数据,不能进行删除操作!");
 			}
-			
 			if(i == metadata_ids.length -1){
 				del_para_str = del_para_str + "'"+metadata_ids[i]+"'" ;
 			}else{

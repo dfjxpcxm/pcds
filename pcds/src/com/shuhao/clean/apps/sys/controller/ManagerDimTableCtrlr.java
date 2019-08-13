@@ -74,7 +74,6 @@ public class ManagerDimTableCtrlr extends BaseCtrlr {
 	@ResponseBody
 	public Map<String, Object> addDimInfo(DimTable dimTable)
 			throws Exception {
-
 		Map<String, Object> result = new HashMap<String, Object>();
 		try {
 			dimTableService.addDimInfo(dimTable);

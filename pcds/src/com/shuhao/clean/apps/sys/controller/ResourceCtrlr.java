@@ -49,7 +49,6 @@ public class ResourceCtrlr extends BaseCtrlr {
 		SysUserInfo user = (SysUserInfo) session.getAttribute("currentUser");
 		if(user == null)
 			throw new ServletException("用户未登陆");
-		
 		String menu = "";
 		try {
 			model.setViewName("main");

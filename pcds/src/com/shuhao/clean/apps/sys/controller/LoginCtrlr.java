@@ -157,12 +157,6 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 			//用户菜单
 			session.setAttribute(USER_RESOURCE, resourceService.getUserResource(user));
 
-			//初始化年份
-//			Map<String, Object> paramMap = new HashMap<String, Object>();
-//			paramMap.put("year_id",  currentMonth.substring(0, 4));
-//			paramMap.put("owner_id",  user.getBank_org_id());
-//			this.userService.initSysYear(paramMap);
-
 			//登录成功之后记录登录日志
 //			String loginIP = this.getUserIP(request);
 //			sessionLogWriter.addSessionLog(session.getId(), user, loginIP);

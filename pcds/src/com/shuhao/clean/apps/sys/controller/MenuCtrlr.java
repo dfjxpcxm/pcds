@@ -94,7 +94,6 @@ public class MenuCtrlr extends BaseCtrlr {
 	 */
 	@RequestMapping(value="/redirect/{path}")
 	public String redirectto(@PathVariable String path, HttpServletRequest request){
-		logger.debug("[redirect]跳转路径 :"+path);
 		return "redirect:/{path}";
 	}
 	

@@ -180,15 +180,29 @@ public enum DatabaseType {
 		}
 		
 		public String queryColumnExistsSql() throws IllegalArgumentException {
-			return null;
+			StringBuffer sql = new StringBuffer("");
+			sql.append("select count(*) as col_count from information_schema.COLUMNS ");
+			sql.append("where table_name = ? ");
+			sql.append("and column_name = ?");
+			return sql.toString();
 		}
 		
 		public String[] addColumnSqls(DbColumn dbColumn) throws IllegalArgumentException {
-			return null;
+			String[] sqls = new String[1];
+			StringBuffer sql = new StringBuffer(300);
+			sql.append("alter table ").append(dbColumn.getTable_name()).append(" add ");
+			sql.append(dbColumn.getColumn_name()).append(" ").append(parseDataType(dbColumn.getData_type_cd(), dbColumn.getData_length()));
+			if(!"Y".equals(dbColumn.getIs_nullable())) {
+				sql.append(" not null");
+			}
+			sql.append(" comment '"+ dbColumn.getColumn_desc()+"' ");
+			sqls[0] = sql.toString();
+			return sqls;
 		}
 		
 		public String[] updateColumnSqls(DbColumn dbColumn) throws IllegalArgumentException {
-			return null;
+
+			return new String[]{"ALTER TABLE  "+dbColumn.getTable_name()+" MODIFY COLUMN "+dbColumn.getColumn_name()+" "+parseDataType(dbColumn.getData_type_cd(), dbColumn.getData_length())+" COMMENT '" + dbColumn.getColumn_desc() + "'"};
 		}
 		
 		public String listTablesSql(String searchKey) throws IllegalArgumentException {
@@ -204,6 +218,8 @@ public enum DatabaseType {
 			sql.append("order by a.table_name ");
 			return sql.toString();
 		}
+
+
 	}, 
 	Sybase("05", "") {
 
@@ -328,7 +344,7 @@ public enum DatabaseType {
 	
 	protected String parseDataType(String dataTypeCd, String length) {
 		if("01".equals(dataTypeCd))
-			return "varchar2("+length+")";
+			return "varchar("+length+")";
 		else if("02".equals(dataTypeCd))
 			return "number";
 		else
@@ -369,7 +385,8 @@ public enum DatabaseType {
 	 * @throws IllegalArgumentException
 	 */
 	public abstract String listTablesSql(String searchKey) throws IllegalArgumentException;
-	
+
+
 	public static void main(String[] args) {
 		System.out.println(DatabaseType.Oracle.queryTableColumnSql());
 	}
