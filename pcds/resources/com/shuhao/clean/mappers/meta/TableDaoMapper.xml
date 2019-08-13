@@ -9,10 +9,12 @@
 		insert into upp_table (
 			table_id,
 			table_name,
+			table_data_source,
 			table_desc
 		) values (
 			#{table_id},
 			#{table_name},
+			#{table_data_source},
 			#{table_desc}
 		)
 	</insert>
@@ -23,6 +25,7 @@
 		select 
 			a.table_id,
 			a.table_name,
+			a.table_data_source,
 			a.table_desc
 		from upp_table a
 		where a.table_id = #{table_id}

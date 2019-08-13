@@ -133,6 +133,7 @@ public class TableServiceImpl implements ITableService {
 					Map<String, Object> map = new HashMap<String, Object>();
 					map.put("table_name", rs.getString("TABLE_NAME").toLowerCase());
 					map.put("table_desc", rs.getString("TABLE_DESC"));
+					map.put("table_data_source", rs.getString("TABLE_SCHEMA"));
 					dataList.add(map);
 				}
 				return dataList;

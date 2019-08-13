@@ -190,7 +190,7 @@ public enum DatabaseType {
 		public String[] addColumnSqls(DbColumn dbColumn) throws IllegalArgumentException {
 			String[] sqls = new String[1];
 			StringBuffer sql = new StringBuffer(300);
-			sql.append("alter table ").append(dbColumn.getTable_name()).append(" add ");
+			sql.append("alter table ").append(dbColumn.getTable_data_source().concat(".") +dbColumn.getTable_name()).append(" add ");
 			sql.append(dbColumn.getColumn_name()).append(" ").append(parseDataType(dbColumn.getData_type_cd(), dbColumn.getData_length()));
 			if(!"Y".equals(dbColumn.getIs_nullable())) {
 				sql.append(" not null");
@@ -202,13 +202,14 @@ public enum DatabaseType {
 		
 		public String[] updateColumnSqls(DbColumn dbColumn) throws IllegalArgumentException {
 
-			return new String[]{"ALTER TABLE  "+dbColumn.getTable_name()+" MODIFY COLUMN "+dbColumn.getColumn_name()+" "+parseDataType(dbColumn.getData_type_cd(), dbColumn.getData_length())+" COMMENT '" + dbColumn.getColumn_desc() + "'"};
+			return new String[]{"ALTER TABLE "+dbColumn.getTable_data_source()+"."+dbColumn.getTable_name()+" MODIFY COLUMN "+dbColumn.getColumn_name()+" "+parseDataType(dbColumn.getData_type_cd(), dbColumn.getData_length())+" COMMENT '" + dbColumn.getColumn_desc() + "'"};
 		}
 		
 		public String listTablesSql(String searchKey) throws IllegalArgumentException {
 			StringBuffer sql = new StringBuffer();
 			sql.append("select ");
 			sql.append("a.table_name,");
+			sql.append("a.table_schema,");
 			sql.append("a.table_comment as table_desc ");
 			sql.append("from information_schema.tables a ");
 			//sql.append("where a.table_name = b.table_name ");

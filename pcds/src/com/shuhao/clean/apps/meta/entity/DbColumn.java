@@ -12,6 +12,7 @@ public class DbColumn {
 	private String owner_id;
 	private String table_id;
 	private String table_name;
+	private String table_data_source;
 	private String column_name;
 	private String column_desc;
 	private String data_type_cd;
@@ -108,4 +109,11 @@ public class DbColumn {
 		is_nullable = isNullable;
 	}
 
+	public String getTable_data_source() {
+		return table_data_source;
+	}
+
+	public void setTable_data_source(String table_data_source) {
+		this.table_data_source = table_data_source;
+	}
 }

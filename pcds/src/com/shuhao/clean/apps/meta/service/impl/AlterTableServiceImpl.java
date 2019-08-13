@@ -164,6 +164,7 @@ public class AlterTableServiceImpl implements IAlterTableService {
 		//获取数据库连接
 		UppDatabase database = this.databaseService.getDatabaseById(dbColumn.getDatabase_id());
 		final UppUser user = this.userService.getUserById(dbColumn.getOwner_id());
+		final UppTable table = this.tableService.getTableById(dbColumn.getTable_id());
 		String url = database.getConnect_str();
 		String username = user.getUser_name();
 		String password = user.getUser_password();
@@ -171,6 +172,7 @@ public class AlterTableServiceImpl implements IAlterTableService {
 		Connection conn = dbType.getDBConnection(url, username, password);
 		//查询是否已有列
 		final String isExistsSql = dbType.queryColumnExistsSql();
+		dbColumn.setTable_data_source(table.getTable_data_source());
 		final String[] addSqls = dbType.addColumnSqls(dbColumn);
 		try {
 			PreparedStatement ps = conn.prepareStatement(isExistsSql);
@@ -213,10 +215,12 @@ public class AlterTableServiceImpl implements IAlterTableService {
 		//获取数据库连接
 		UppDatabase database = this.databaseService.getDatabaseById(dbColumn.getDatabase_id());
 		final UppUser user = this.userService.getUserById(dbColumn.getOwner_id());
+		final UppTable table = this.tableService.getTableById(dbColumn.getTable_id());
 		
 		String url = database.getConnect_str();
 		String username = user.getUser_name();
 		String password = user.getUser_password();
+		dbColumn.setTable_data_source(table.getTable_data_source());
 		
 		final DatabaseType dbType = DatabaseType.getValue(database.getDatabase_type_cd());
 		Connection conn = dbType.getDBConnection(url, username, password);

@@ -14,6 +14,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -79,7 +81,7 @@ public class PageManagerCtrlr extends BaseCtrlr {
 	
 	/**
 	 * 前端调用事件方法,调试时可采用XmlUtils
-	 * @param metaId
+	 * @param metaName
 	 * @return
 	 * @throws Exception
 	 */
@@ -239,15 +241,16 @@ public class PageManagerCtrlr extends BaseCtrlr {
 //		}
 		String tableName = GlobalUtil.getStringValue(eleMap, "table_name");
 		String tmpl_id = GlobalUtil.getStringValue(eleMap, "tmpl_id");
-		StringBuffer insert = new StringBuffer("insert into ").append(tableName).append(" ( ");
+		String tableDataSource = GlobalUtil.getStringValue(eleMap, "table_data_source");
+		StringBuffer insert = new StringBuffer("insert into "+tableDataSource+".").append(tableName).append(" ( ");
 		StringBuffer insertValues = new StringBuffer("values ( ");
-		StringBuffer update = new StringBuffer("update ").append(tableName).append(" set ");
+		StringBuffer update = new StringBuffer("update "+tableDataSource+".").append(tableName).append(" set ");
 		StringBuffer where = new StringBuffer(" where 1=1 and business_no=#business_no");
 		StringBuffer select = new StringBuffer("select ");
-		StringBuffer selectWhere = new StringBuffer(" from ").append(tableName).append(" where 1=1 ");
+		StringBuffer selectWhere = new StringBuffer(" from "+tableDataSource+".").append(tableName).append(" where 1=1 ");
 		StringBuffer load = new StringBuffer("select ");
-		StringBuffer loadWhere = new StringBuffer(" from ").append(tableName).append(" where 1=1 ");
-		StringBuffer deleteByAcctID = new StringBuffer("delete from "+tableName+" where acct_id = #");
+		StringBuffer loadWhere = new StringBuffer(" from "+tableDataSource+".").append(tableName).append(" where 1=1 ");
+		StringBuffer deleteByAcctID = new StringBuffer("delete from "+tableDataSource+"."+tableName+" where acct_id = #");
 		
 		
 		//先在查询语句加关联元数据
@@ -362,7 +365,6 @@ public class PageManagerCtrlr extends BaseCtrlr {
 
 	/**
 	 * 自定义跳转
-	 * @param url
 	 * @param model
 	 * @return
 	 */
@@ -451,13 +453,16 @@ public class PageManagerCtrlr extends BaseCtrlr {
 						sql =  (String)request.getSession().getAttribute("update_"+tmpl_id);
 					}
 				}
+				String regEx="[0-9][0-9][0-9][0-9]";
 				for (Iterator<String> iterator = map.keySet().iterator(); iterator.hasNext();) {
 					String key =  iterator.next();
 					Object o = map.get(key);
 					if (!key.equals("sql") && !key.contains("_")) {
 						params.put(key, o);
 					}else {
-						if (key.split("_").length > 1) {
+						Pattern p = Pattern.compile(regEx);
+						Matcher m = p.matcher(key);
+						if (key.split("_").length > 1 && m.find()) {
 							int n = key.split("_")[0].length();
 							params.put(key.substring(n+1, key.length()), o);
 						}else{
@@ -627,7 +632,6 @@ public class PageManagerCtrlr extends BaseCtrlr {
 	
 	/**
 	 * 读取模板文件
-	 * @param templateId
 	 * @return
 	 * @throws DocumentException
 	 */
@@ -1085,7 +1089,7 @@ public class PageManagerCtrlr extends BaseCtrlr {
 	 * 返回column_name索引
 	 * @param column_name
 	 * @param rela_names
-	 * @param b
+	 * @param caseSen
 	 */
 	private int getInArray(String column_name, String[] rela_names, boolean caseSen) {
 		for (int i = 0; i < rela_names.length; i++) {
@@ -1103,7 +1107,7 @@ public class PageManagerCtrlr extends BaseCtrlr {
 
 	/**
 	 * @param colList
-	 * @param string
+	 * @param colName
 	 * @return
 	 */
 	private String[] colList2ColArray(List<Map<String, Object>> colList, String colName) {
@@ -1116,7 +1120,7 @@ public class PageManagerCtrlr extends BaseCtrlr {
 
 	/**
 	 * 导出模板文件
-	 * @param templateId   模板ID
+	 * @param metadata_id   模板ID
 	 * @param request
 	 * @param response
 	 * @return
@@ -1468,10 +1472,9 @@ public class PageManagerCtrlr extends BaseCtrlr {
 	/**
 	 * 按模版ID 查询数据
 	 * @param tmpl_id 
-	 * @param treeList
-	 * @param data
-	 * @param level
-	 * @throws Exception 
+	 * @param type
+	 * @param type
+	 * @throws Exception
 	 */
 	private List<Map<String,Object>> queryDataForList(String tmpl_id,String type) throws Exception {
 		StringBuffer bf = new StringBuffer();
@@ -1645,9 +1648,8 @@ public class PageManagerCtrlr extends BaseCtrlr {
 	/**
 	 * 按模版ID 查询数据
 	 * @param tmpl_id 
-	 * @param treeList
-	 * @param data
-	 * @param level
+	 * @param parentSql
+	 * @param relaCol
 	 * @throws Exception 
 	 */
 	private List<Map<String,Object>> querySubDataForList(String tmpl_id,String relaCol,String parentSql) throws Exception {

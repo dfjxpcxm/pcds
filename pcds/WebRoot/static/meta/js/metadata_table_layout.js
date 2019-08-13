@@ -6,7 +6,7 @@ Ext.onReady(function(){
 	var infoPanel = new Ext.form.FormPanel({
 		title : '表属性',
 	    region:'north',
-	    height:190,
+	    height:210,
 		layout : 'form',
 		url : pathUrl + "/metadata/table/save",
 		method : 'POST',
@@ -23,6 +23,7 @@ Ext.onReady(function(){
 		}, [
 			{name : 'table_id'}, 
 			{name : 'table_name'}, 
+			{name : 'table_data_source'},
 			{name : 'table_desc'}
 		]),
 		items : [{
@@ -40,6 +41,15 @@ Ext.onReady(function(){
 				name : 'table_name',
 				fieldLabel : '表名',
 				allowBlank : false,
+				anchor : formItemAnchor
+			},{
+				xtype : 'textfield',
+				itemCls  : 'uxHeight',
+				id : 'table_data_source',
+				readOnly : true,
+				name : 'table_data_source',
+				allowBlank : false,
+				fieldLabel : '表源',
 				anchor : formItemAnchor
 			},{
 				xtype : 'textfield',

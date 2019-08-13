@@ -432,7 +432,7 @@ function addTable(parentNode, md_cate_cd) {
 				}
 			}
 		},
-		fields : ['table_name','table_desc']
+		fields : ['table_name','table_desc','table_data_source']
 	});
 	
 	var cm = new Ext.grid.ColumnModel([new Ext.grid.RowNumberer(), {
@@ -441,8 +441,10 @@ function addTable(parentNode, md_cate_cd) {
 	}, {
 		header : '表描述',
 		dataIndex : 'table_desc'
+	}, {
+		header : '数据表源库',
+		dataIndex : 'table_data_source'
 	}]);
-	
 	var menu = [{
 		text : '关键字：'
 	}, {
@@ -480,6 +482,7 @@ function addTable(parentNode, md_cate_cd) {
 	gridPanel.getSelectionModel().on("rowselect",function(sm, number, record){
 		Ext.getCmp("add_table_name").setValue(record.get("table_name"));
 		Ext.getCmp("add_table_desc").setValue(record.get("table_desc"));
+		Ext.getCmp("add_table_data_source").setValue(record.get("table_data_source"));
 	});
 	
 	var formPanel = new Ext.form.FormPanel({
@@ -507,6 +510,12 @@ function addTable(parentNode, md_cate_cd) {
 				name : 'table_desc',
 				id : 'add_table_desc',
 				fieldLabel : '数据表描述',
+				anchor : '91%'
+			}, {
+				xtype : 'textfield',
+				name : 'table_data_source',
+				id : 'add_table_data_source',
+				fieldLabel : '数据表源库',
 				anchor : '91%'
 			}, {
 				xtype : 'numberfield',

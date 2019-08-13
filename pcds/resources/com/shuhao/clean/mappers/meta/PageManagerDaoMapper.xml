@@ -215,6 +215,7 @@
 			 a.rela_metadata_names,
 			 d.table_id,
 			 d.table_name,
+			 d.table_data_source,
 			 b.page_element_id,
 			 a.display_order,
 			 e.flow_tmpl_id
@@ -234,6 +235,7 @@
            a.rela_metadata_names,
            d.table_id,
            d.table_name,
+           d.table_data_source,
            b.page_element_id,
 		   a.display_order,
            e.flow_tmpl_id

@@ -13,7 +13,8 @@ public class UppTable extends UppMetadata {
 	private String table_id;
 	private String table_name;
 	private String table_desc;
-	
+	private String table_data_source;
+
 	public String getMetadata_id() {
 		return table_id;
 	}
@@ -50,4 +51,11 @@ public class UppTable extends UppMetadata {
 		table_desc = tableDesc;
 	}
 
+	public String getTable_data_source() {
+		return table_data_source;
+	}
+
+	public void setTable_data_source(String table_data_source) {
+		this.table_data_source = table_data_source;
+	}
 }
