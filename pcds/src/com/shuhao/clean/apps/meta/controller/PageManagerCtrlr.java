@@ -1586,6 +1586,8 @@ public class PageManagerCtrlr extends BaseCtrlr {
 			}
 		}
 
+        boolean flowStat = pageManagerService.getFlowDataCountsByTplId(tmpl_id);
+
 		StringBuffer buffer = new StringBuffer();
 		SysUserInfo currUser = getCurrentUser();
 		String user_id = currUser.getUser_id();
@@ -1625,7 +1627,12 @@ public class PageManagerCtrlr extends BaseCtrlr {
 			queryParams.put("nodeIds", bf.toString());
 			queryParams.put("isShared", isShared);
 			queryParams.put("hasApprove", hasApprove);
-			buffer.append(WorkFlowUtil.getQuerySql(querySql, queryParams));
+			if(flowStat){
+                buffer.append(WorkFlowUtil.getQuerySql(querySql, queryParams));
+            }else{
+                buffer.append(querySql);
+            }
+
 		}
 		
 		params.put("sql", buffer.toString());

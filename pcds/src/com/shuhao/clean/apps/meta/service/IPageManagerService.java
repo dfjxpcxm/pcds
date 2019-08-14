@@ -261,4 +261,7 @@ public interface IPageManagerService {
 	 * @throws Exception
 	 */
 	public String getFieldType(String metadataId) throws Exception;
+
+
+	public boolean getFlowDataCountsByTplId(String tmpId) throws Exception;
 }

@@ -373,4 +373,10 @@
 	<select id="getFieldType"  parameterType="map" resultType="map">
 		select component_type_id from upp_page_field where field_id = #{metadata_id} 
 	</select>
+
+
+	<select id="getFlowDataCountsByTplId"  parameterType="String" resultType="int">
+		  select count(1) as cnt from upp_tmpl_flow where tmpl_id=#{tmpId}
+	</select>
+
 </mapper>

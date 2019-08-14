@@ -122,7 +122,7 @@ var topMenu = [{
 		});
 	}
 }, '-',{
-	text:'发布？',
+	text:'发布',
 	menu:[{
 		text : '发布',
 		iconCls : 'submit',

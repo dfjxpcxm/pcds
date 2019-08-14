@@ -209,4 +209,7 @@ public interface PageManagerDao {
 	 */
 	public Map<String, Object> getFieldType(Map<String,Object> params) throws Exception;
 
+
+	public Integer getFlowDataCountsByTplId(String tmpId) throws Exception;
+
 }

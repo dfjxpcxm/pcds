@@ -689,8 +689,20 @@ public class PageManagerServiceImpl extends BaseJdbcService implements IPageMana
 		}
 		return "";
 	}
-	
-	/**
+
+    @Override
+    public boolean getFlowDataCountsByTplId(String tmpId) throws Exception {
+	    boolean bool = false;
+        Integer cnt = this.pageManagerDao.getFlowDataCountsByTplId(tmpId);
+        if(cnt >0){
+            bool = true;
+        }else{
+            bool = false;
+        }
+        return bool;
+    }
+
+    /**
 	 * 生成初始化sql
 	 * @throws Exception
 	 */
