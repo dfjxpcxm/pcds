@@ -165,7 +165,7 @@ public class DimLinkAjaxCtrlr extends BaseCtrlr {
 	/**
 	 * 树形显示查询
 	 * 
-	 * @return
+	 * @returntoUpperCase
 	 * @throws Exception
 	 */
 	@RequestMapping(value="expandDimLinkTree")

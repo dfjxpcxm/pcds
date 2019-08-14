@@ -36,7 +36,7 @@ public class DimLinkAjaxServiceImpl implements IDimLinkAjaxService{
 	
 	public List<? extends Object> queryFieldDetail(Map<String, Object> param) {
 			Map<String,Object> sql = new HashMap<String, Object>();
-			sql.put("sql", GlobalUtil.getStringValue(param, "dim_sql_expr"));
+			sql.put("sql", GlobalUtil.getStringValue(param, "dim_sql_expr").toUpperCase());
 			List<Map<String, Object>> list = this.dimLinkAjaxDao.queryForList(sql);
 			String isEditTable = String.valueOf(param.get("is_table_edit"));
 			for (int i = 0; i < list.size(); i++) {
@@ -49,7 +49,7 @@ public class DimLinkAjaxServiceImpl implements IDimLinkAjaxService{
 					//主键值集合
 					StringBuffer pkValues=new StringBuffer();
 					for(String pk:pkArray){
-						String val=DataHandle.toSqlParam(map.get(pk.toUpperCase()));
+						String val=DataHandle.toSqlParam(map.get(pk));//pk.toUpperCase()
 						pkValues.append(val+",");
 					}
 					String pkValuesStr=pkValues.substring(0, pkValues.length()-1);
