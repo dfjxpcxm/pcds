@@ -384,7 +384,7 @@
 
 
 	<select id="getFlowDataCountsByTplId"  parameterType="String" resultType="int">
-		  select count(1) as cnt from upp_tmpl_flow where tmpl_id=#{tmpId}
+		  select count(1) as cnt from upp_tmpl_flow w ,upp_flow_sequences s where w.FLOW_TMPL_ID=s.FLOW_ID and w.tmpl_id=#{tmpId}
 	</select>
 
 </mapper>
