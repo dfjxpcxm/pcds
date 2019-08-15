@@ -318,7 +318,7 @@ public class PageManagerCtrlr extends BaseCtrlr {
 		
 		insert.append(" )").append(insertValues).append(" )");
 		update.append(where);
-		select .append(selectWhere);
+		select.append(selectWhere);
 		load.append(loadWhere);
 		request.getSession().setAttribute("insert_"+tmpl_id, insert.toString());
 		request.getSession().setAttribute("update_"+tmpl_id, update.toString());
@@ -337,11 +337,11 @@ public class PageManagerCtrlr extends BaseCtrlr {
 			}
 		}
 
-		String parentTable = GlobalUtil.getStringValue(parentMap, "table_name");
+		String parentTable =  GlobalUtil.getStringValue(parentMap,"table_data_source").concat(".") + GlobalUtil.getStringValue(parentMap, "table_name");
 		StringBuffer delete = new StringBuffer();
 		for (int j = 0; j < childList.size(); j++) {
 			Map<String, Object> map = childList.get(j);
-			String childtableName = GlobalUtil.getStringValue(map, "table_name");
+			String childtableName =GlobalUtil.getStringValue(map, "table_data_source").concat(".") + GlobalUtil.getStringValue(map, "table_name");
 			String rela_metadata_names = GlobalUtil.getStringValue(map, "rela_metadata_names");
 			String[] relaNames = rela_metadata_names.split(",");
 			delete.append(" delete from "+childtableName+" where 1=1 ");
@@ -537,6 +537,8 @@ public class PageManagerCtrlr extends BaseCtrlr {
 			String tmpl_id = request.getParameter("tmpl_id");
 			//表名
 			String tableName = pageManagerService.getTabNameByTempId(map);
+			//表组合
+			//Map tableMap = pageManagerService.getTabMapByTempId(map);
 			map.put("tableName", tableName);
 			//提交前执行：总分校验
 			List<Map<String, Object>> accts = pageManagerService.getSubmitAccts(map);
@@ -803,12 +805,15 @@ public class PageManagerCtrlr extends BaseCtrlr {
 							List<Map<String, Object>> hiddenValues = null;
 							int rowNum = 1;
 							String tableName = "";
+							String tableDataSource = "";
+
 							//导入未配置关联excel,使用默认的当前表配置的字段信息
 							if(MetaConstant.DEFAULT_METADATA_ID.equals(metadata_id)){
 								//默认的时候使用页面元数据的校验规则
 								rowNum = 2;
 								tableName = pageManagerService.getTabNameByTempId(tmplMap);
-								
+								Map tableMap = pageManagerService.getTabMapByTempId(tmplMap);
+								tableDataSource = (String) tableMap.get("TABLE_DATA_SOURCE");
 								colList = pageManagerService.getFDLByTmplId(tmplMap);
 								mappings = colList2ColArray(colList,"field_name");
 								
@@ -829,6 +834,7 @@ public class PageManagerCtrlr extends BaseCtrlr {
 							}
 							
 							//按字段列表生成sql，delSql,insSql
+							tableName = tableDataSource.concat(".") + tableName;
 							Map<String,Object> sqls = createImpSqls(colList,tableName,relaNames,relaValues,metadata_id);
 							
 							for (int j =rowNum-1; j < dataList.size(); j++) {
@@ -1008,8 +1014,8 @@ public class PageManagerCtrlr extends BaseCtrlr {
 		delSql.append("delete from ").append(tableName).append(" where 1=1 ");
 		//如果关联为null,默认使用acct_id
 		if(relaNames==null ||relaNames.equals("")){
-			delSql.append(" and acct_id = ");
-		} 
+			//delSql.append(" and acct_id = ");
+		}
 		//循环字段列表
 		for (int i = 0; i < colList.size(); i++) {
 			Map<String,Object> map = colList.get(i);

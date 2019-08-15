@@ -42,8 +42,12 @@ public interface BckTrackingDao {
 	
 	//获取纬表查询的数据
 	public  List<Map<String,Object>> getDimLinkForTree(Map<String,Object> params) throws Exception;
+
 	//根据模板iD查询模板对应的表
 	public String getTabNameByTempId(Map<String,Object> params) throws Exception;
+
+	//根据模板iD查询模板对应的表
+	public Map getTabMapByTempId(Map<String,Object> params) throws Exception;
 	
 	//获取模板对应的所有维度代码的关联sql
 	public List<Map<String,Object>> getMetaLinkJoinSql(Map<String,Object> params) throws Exception;

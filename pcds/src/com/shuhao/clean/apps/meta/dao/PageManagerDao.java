@@ -43,6 +43,11 @@ public interface PageManagerDao {
 	public  List<Map<String,Object>> getDimLinkForTree(Map<String,Object> params) throws Exception;
 	//根据模板iD查询模板对应的表
 	public String getTabNameByTempId(Map<String,Object> params) throws Exception;
+
+	//根据模板iD查询模板对应的表map
+	public Map getTabMapByTempId(Map<String,Object> params) throws Exception;
+
+
 	
 	//取button配置信息
 	public List<Map<String,Object>> getButtonByTmplId(Map<String,Object> params) throws Exception;

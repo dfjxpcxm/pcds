@@ -90,6 +90,8 @@ public interface IPageManagerService {
 
 	
 	public String getTabNameByTempId(Map<String,Object> params) throws Exception;
+
+	public Map getTabMapByTempId(Map<String,Object> params) throws Exception;
 	/**
 	 * 取button配置信息
 	 * @param params

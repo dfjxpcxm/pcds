@@ -230,6 +230,10 @@ public class PageManagerServiceImpl extends BaseJdbcService implements IPageMana
 	public String getTabNameByTempId(Map<String,Object> params) throws Exception{
 		return this.pageManagerDao.getTabNameByTempId(params);
 	}
+
+	public Map getTabMapByTempId(Map<String,Object> params) throws Exception{
+		return this.pageManagerDao.getTabMapByTempId(params);
+	}
 	
 	/**
 	 * 取button配置信息
