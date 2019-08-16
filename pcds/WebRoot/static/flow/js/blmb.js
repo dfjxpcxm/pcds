@@ -229,6 +229,7 @@ function doAddNode(tree){
 						allowBlank : false,
 						fieldLabel : '选择流程',
 						id:'FlowSelector',
+					disabled : true,
 						emptyText : '请选择一个流程',
 						name : 'flow_tmpl_id',
 						anchor : '100%'
@@ -487,8 +488,9 @@ function doEditNode(tree) {
 				hiddenName : 'flow_tmpl_id',
 				triggerAction : 'all',
 				allowBlank : false,
-				fieldLabel : '选择流程',
+				fieldLabel : '选择流程1',
 				id:'FlowSelector',
+					disabled : true,
 				emptyText : '请选择一个流程',
 				name : 'flow_tmpl_id',
 				anchor : '100%'

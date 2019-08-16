@@ -3,6 +3,7 @@ package com.shuhao.clean.apps.meta.controller;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -21,10 +22,12 @@ import com.shuhao.clean.utils.UID;
 @Controller
 @RequestMapping(value="/metadata/table")
 public class TableCtrlr extends BaseCtrlr {
-	
+
 	@Autowired
 	private ITableService tableService = null;
-	
+
+	@Autowired
+	public JdbcTemplate jdbcTemplate;
 	/**
 	 * 添加数据库表对象
 	 * @param table
@@ -36,12 +39,18 @@ public class TableCtrlr extends BaseCtrlr {
 	public Map<String, Object> add(UppTable table) throws Exception {
 		boolean addSuccess = false;
 		String errorInfo = null;
+		String sql = "alter table "+table.getTable_data_source().concat(".")+table.getTable_name()+" add business_no varchar(255);";
+		String queryColumn = "select count(*) as col_count from information_schema.COLUMNS where table_schema = '"+table.getTable_data_source()+"' and table_name = '"+table.getTable_name()+"' and column_name = 'business_no'";
 		try {
+			if (this.jdbcTemplate.queryForInt(queryColumn) == 0){
+				this.jdbcTemplate.execute(sql);
+			}
 			table.setTable_id(UID.next());
 			table.setCreate_user_id(super.getCurrentUser().getUser_id());
 			this.tableService.addTable(table);
 			addSuccess = true;
 			this.tableService.syncTableColumn(table.getTable_id(), true, table.getCreate_user_id());
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			errorInfo = e.getMessage();
