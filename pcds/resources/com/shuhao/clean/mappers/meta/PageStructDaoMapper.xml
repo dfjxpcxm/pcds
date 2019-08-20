@@ -50,7 +50,7 @@
 	
 	<!-- 删除页面结构对象 -->
 	<delete id="deletePageStruct" parameterType="string">
-		delete from upp_page_struct where page_struct_id = #{page_struct_id}
+		delete from upp_page_struct a where a.page_struct_id = #{page_struct_id}
 	</delete>
 	
 	<!-- 查询通用页面结构所属页面 -->

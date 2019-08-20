@@ -46,20 +46,7 @@ private static String totalNum = "0";
 		}
 		userDao.addUser(user);
 	}
-
-	@Override
-	public void addUserRoleInfo(String userId, String roleId) throws Exception {
-		Map<String, Object> paramMap = new HashMap<String, Object>();
-		paramMap.put("user_id", userId);
-		paramMap.put("role_id", roleId);
-		userDao.addUserRole(paramMap);
-	}
-
-	@Override
-	public void updataUser(SysUserInfo user) throws Exception {
-		userDao.updateUser(user);
-	}
-
+	
 	//删除用户(删除用户、删除用户角色、删除用户特殊授权)
 	public void removeUser(String userID)throws Exception{
 		userDao.removeUser(userID);
