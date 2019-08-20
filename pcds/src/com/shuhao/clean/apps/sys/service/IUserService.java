@@ -24,6 +24,11 @@ public interface IUserService {
 	
 	//添加用户
 	public void addUser(SysUserInfo user)throws Exception;
+
+	public void addUserRoleInfo(String userId,String roleId) throws Exception;
+
+
+	public void updataUser (SysUserInfo user)throws Exception;
 	
 	//删除用户
 	public void removeUser(String userID)throws Exception;
