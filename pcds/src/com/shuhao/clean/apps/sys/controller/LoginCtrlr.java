@@ -1,12 +1,22 @@
 package com.shuhao.clean.apps.sys.controller;
 
+import java.security.Principal;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import com.shuhao.clean.apps.sys.synchrodata.CookieUtil;
+import com.shuhao.clean.apps.sys.synchrodata.Dom4jUtil;
+import com.shuhao.clean.apps.sys.synchrodata.PropertiesUtil;
+import com.shuhao.clean.apps.sys.synchrodata.SynchronizedDataConstants;
+import com.shuhao.clean.apps.sys.synchrodata.WebClient;
+import com.shuhao.clean.utils.StringUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,6 +33,8 @@ import com.shuhao.clean.toolkit.log.SessionLogWriter;
 import com.shuhao.clean.toolkit.log.annotation.FunDesc;
 import com.shuhao.clean.toolkit.log.annotation.UseLog;
 import com.shuhao.clean.utils.Md5Util;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * <p>Title: 登录控制类，所有controller类的父类</p>
@@ -115,6 +127,9 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 		}
 	}
 
+
+
+
 	/**
 	 * Ajax登陆方法
 	 * @return
@@ -128,8 +143,26 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 		//获取前端登陆参数
 //		String user_id = request.getParameter("user_id");
 //		String password = request.getParameter("password");
-		String user_id = "00000";
+//		String user_id = "00000";
+		String user_id = "000001";
 		String password ="password";
+
+
+		//获取前端登陆参数
+		String userId = getCasLoginUsername();
+		if(null == user_id || "".equals(user_id) || "null".equals(user_id)){
+			user_id = CookieUtil.getValue(request, SynchronizedDataConstants.CAS_LOGIN_USER);
+			if (StringUtil.isNullStr(user_id)){
+				user_id = "admin";
+				System.out.println("*********************取得cas用户名失败，设置为默认管理员【admin】！------------------");
+			}
+		}
+
+
+
+		List<Map<String,Object>> list =  getPortalUser(user_id);
+		//同步用户数据
+		getUserInfo(list);
 
 		//JSON返回结果Map
 		Map<String, Object> results = new HashMap<String, Object>();
@@ -221,7 +254,7 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 			//登录成功之后记录登录日志
 //			String loginIP = this.getUserIP(request);
 //			sessionLogWriter.addSessionLog(session.getId(), user, loginIP);
-			
+			session.setAttribute("casUrl",this.getServerIp());
 			result.put("status", "true");
 			JSONObject jsonObj = new JSONObject(result);
 			return param + "(" + jsonObj.toString() + ")";
@@ -236,8 +269,8 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 	
 	/**
 	 * 用户退出
-	 * @param mapping
-	 * @param form
+	 * param mapping
+	 * param form
 	 * @param request
 	 * @param response
 	 * @return
@@ -287,4 +320,96 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 		}
 		return request.getHeader("x-forwarded-for");
 	}
+
+
+
+	private String getCasLoginUsername() {
+		String username = request.getRemoteUser();
+		if(StringUtils.isNotBlank(username))
+			return username;
+		Principal pal = request.getUserPrincipal();
+		if(pal != null){
+			username = pal.getName();
+			if(username != null)
+				return username;
+		}
+		Object obj = request.getAttribute("credentials");
+		if(obj != null){
+			return obj.toString();
+		}
+
+		return username;
+	}
+
+
+
+	public List<Map<String,Object>> getPortalUser(String user_id) throws Exception{
+		WebClient web = new WebClient();
+		Map<String,Object> mp = new HashMap<String, Object>();
+		mp.put("arg0",getParamsByReq(request, "thisName"));
+		mp.put("arg1",user_id);
+		String operationName = SynchronizedDataConstants.GET_ONEUSER_WSDL_OPERATION_NAME;
+		String retXml = web.getWsdlResultByCode(mp,operationName); //传入参数名，参数值，方法名
+		List<Map<String,Object>> retList = Dom4jUtil.readDom4jXml(retXml);
+		return retList;
+	}
+
+	public static String getParamsByReq(HttpServletRequest request, String name) {
+		ServletContext servletContext = request.getSession().getServletContext();
+		String val = servletContext.getInitParameter(name);
+		return val;
+	}
+
+	public void getUserInfo(List<Map<String, Object>> retList) throws Exception{
+		for (int i = 0; i < retList.size(); i++) {
+			if (ifUser((String) retList.get(i).get("user_name"))){
+				userService.updataUser(setUser(retList.get(i)));
+			}else {
+				userService.addUser(setUser(retList.get(i)));
+				userService.addUserRoleInfo((String) retList.get(i).get("user_name"),DEFAULT_ROLE);
+			}
+		}
+	}
+
+	public boolean ifUser(String user_name) throws Exception{
+		SysUserInfo  userInfo = userService.findUserById(user_name);
+		if(userInfo != null ){
+			return true;
+		}
+		return false;
+	}
+
+
+	public SysUserInfo setUser(Map<String, Object> map){
+		SysUserInfo user = new SysUserInfo();
+		user.setUser_id((String) map.get("user_name"));
+		user.setPassword("X03MO1qnZdYdgyfeuILPmQ==");
+		user.setUser_name((String) map.get("user_real_name"));
+		user.setBank_org_id("101");
+		user.setBank_org_name("8888");
+		return user;
+	}
+
+
+	public  String getServerIp(){
+		String casUrl = PropertiesUtil.getPropery("cas.server.ip");
+		String path = request.getScheme() + "://" + request.getServerName()
+				+ ":" + request.getServerPort();
+		String retProtalUrl = path.concat("/portal");
+		String logoutUrl = casUrl.concat("/logout?service=").concat(urlEncode(retProtalUrl));
+		return logoutUrl;
+	}
+
+	public static String urlEncode(String str) {
+		if("".equals(str) || null ==str)
+			return str;
+		try {
+			return java.net.URLEncoder.encode(str, "UTF-8");
+		} catch (Exception ex) {
+			return str;
+		}
+	}
+
+
+	public final static String DEFAULT_ROLE = "Executive";
 }
