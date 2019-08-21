@@ -82,7 +82,7 @@
 	<!-- 查询用户列表 -->
 	<sql id="getUserSql">
 		select user_id, user_name
-		  from sys_user_info
+		  from opm_sys_user_info
 		 where user_id not in (select user_id from tool_cq_user_ds where ds_id = #{ds_id})
 		 <if test="sType==0 and typeValue !=null and typeValue != ''">
 		   and post_id = #{typeValue}
@@ -103,7 +103,7 @@
 	</select>
 	
 	<select id="getAllotedUserList" parameterType="map" resultType="map">
-	    select user_id, user_name from sys_user_info
+	    select user_id, user_name from opm_sys_user_info
 		where user_id in (select user_id from tool_cq_user_ds where ds_id = #{ds_id})
 	</select>
 	

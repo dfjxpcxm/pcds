@@ -1,5 +1,8 @@
 <%@ page contentType="text/html; charset=utf-8" isELIgnored="false" pageEncoding="utf-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<%
+	String casUrl = (String)session.getAttribute("casUrl");
+%>
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="pragma" content="no-cache"/>
@@ -8,6 +11,7 @@
 		<script type="text/javascript" src="${pageContext.request.contextPath}/public/scripts/jquery/jquery-1.9.1.js"></script>
 		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/public/css/banner.css" />
 		<script type="text/javascript">
+			var casUrl = '<%=casUrl%>';
 			$(function(){
 				$('.container').width(screen.width);
 				$('.r_bg').width(screen.width-174-20);
@@ -24,7 +28,7 @@
 					type : 'POST',
 					data : {},
 					success : function(data) {
-						window.top.location.href = "${pageContext.request.contextPath}/login.jsp";
+						window.top.location.href = casUrl;
 					}
 				});
 			}

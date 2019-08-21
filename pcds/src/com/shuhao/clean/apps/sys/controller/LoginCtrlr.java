@@ -144,8 +144,9 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 //		String user_id = request.getParameter("user_id");
 //		String password = request.getParameter("password");
 //		String user_id = "00000";
-		String user_id = "000001";
+//		String user_id = "000001";
 		String password ="password";
+        String user_id ="";
 
 
 		//获取前端登陆参数
@@ -158,26 +159,33 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 			}
 		}
 
+		//根据输入用户名查询用户列表
+		SysUserInfo user = userService.findUserById(user_id);
+		if(user == null){
+			List<Map<String,Object>> list = this.getPortalUser(user_id);
+			if(null !=list && list.size()>0){
+				//同步用户数据
+				getUserInfo(list);
+			}
 
-
-		List<Map<String,Object>> list =  getPortalUser(user_id);
-		//同步用户数据
-		getUserInfo(list);
-
+			user = userService.findUserById(user_id);
+		}
 		//JSON返回结果Map
 		Map<String, Object> results = new HashMap<String, Object>();
 		try {
 			//根据输入用户名查询用户列表
-			SysUserInfo user = userService.findUserById(user_id);
+//			SysUserInfo user = userService.findUserById(user_id);
 			//判断用户不存在的情况
 			if(user == null){
 				log.info("不存在用户["+user_id+"]");
+				results.put("info", "不存在用户["+user_id+"]");
+				return  null;
 			}
 			//验证密码是否一致
-			password = Md5Util.getPasswordForMD5(password);
+	/*		password = Md5Util.getPasswordForMD5(password);
 			if(!user.getPassword().equals(password)){
 				log.info("用户["+user_id+"]密码输入错误");
-			}
+			}*/
 			//登陆成功处理
 			session.setAttribute(CURRENT_USER, user);
 			//加载系统时间
@@ -185,6 +193,7 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 			//当前月
 			String currentMonth = loginService.getCurrentMonth();
 			session.setAttribute(CURRENT_MONTH, currentMonth);
+            session.setAttribute("casUrl",this.getServerIp());
 			//全部菜单
 //			session.setAttribute("AllResource", resourceService.getAllResource());
 			//用户菜单
@@ -254,7 +263,7 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 			//登录成功之后记录登录日志
 //			String loginIP = this.getUserIP(request);
 //			sessionLogWriter.addSessionLog(session.getId(), user, loginIP);
-			session.setAttribute("casUrl",this.getServerIp());
+
 			result.put("status", "true");
 			JSONObject jsonObj = new JSONObject(result);
 			return param + "(" + jsonObj.toString() + ")";
@@ -383,8 +392,10 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 	public SysUserInfo setUser(Map<String, Object> map){
 		SysUserInfo user = new SysUserInfo();
 		user.setUser_id((String) map.get("user_name"));
-		user.setPassword("X03MO1qnZdYdgyfeuILPmQ==");
 		user.setUser_name((String) map.get("user_real_name"));
+		user.setTelephone((String) map.get("user_tel"));
+		user.setAddress((String) map.get("user_addr"));
+		user.setPassword("X03MO1qnZdYdgyfeuILPmQ==");
 		user.setBank_org_id("101");
 		user.setBank_org_name("8888");
 		return user;
@@ -395,7 +406,7 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 		String casUrl = PropertiesUtil.getPropery("cas.server.ip");
 		String path = request.getScheme() + "://" + request.getServerName()
 				+ ":" + request.getServerPort();
-		String retProtalUrl = path.concat("/portal");
+		String retProtalUrl = path.concat("/pcmss");
 		String logoutUrl = casUrl.concat("/logout?service=").concat(urlEncode(retProtalUrl));
 		return logoutUrl;
 	}
@@ -411,5 +422,5 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 	}
 
 
-	public final static String DEFAULT_ROLE = "Executive";
+	public final static String DEFAULT_ROLE = "U_00002";
 }

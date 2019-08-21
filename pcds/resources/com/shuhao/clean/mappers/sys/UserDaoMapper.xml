@@ -78,62 +78,41 @@
 	<!-- 添加用户 -->
 	<insert id="addUser" parameterType="SysUserInfo">
 		insert into opm_sys_user_info(
+			cust_mgr_id,
 			user_id             ,
-			password            ,
+			paswd            ,
 			user_name           ,
 			owner_org_id        ,
 			bank_org_id         ,
-			job_seq_code        ,
-			job_title_code      ,
-			post_type_code      ,
-			technical_title_code,
+			post_id        ,
+			job_title      ,
+			tech_title_code,
 			busi_line_id        ,
-			join_date           ,
-			employee_id         ,
-			leave_date          ,
 			id_card             ,
 			born_date           ,
-			gender_code         ,
-			nation_code         ,
-			education_code      ,
-			telephone           ,
-			address             ,
-			email               ,
-			postal              ,
+			power_code         ,
+			level_id      ,
+			user_email               ,
 			begin_date          ,
-			end_date            ,
-			status_code         ,
-			remark              
-
+			expire_date
 		) values (
+			#{user_id,jdbcType=VARCHAR},
 			#{user_id,jdbcType=VARCHAR},
 			#{password,jdbcType=VARCHAR},
 			#{user_name,jdbcType=VARCHAR},
 			#{owner_org_id,jdbcType=VARCHAR},
 			#{bank_org_id,jdbcType=VARCHAR},
-			#{job_seq_code,jdbcType=VARCHAR},
-			#{job_title_code,jdbcType=VARCHAR},
 			#{post_type_code,jdbcType=VARCHAR},
+			#{job_title_code,jdbcType=VARCHAR},
 			#{technical_title_code,jdbcType=VARCHAR},
-		<!-- 	#{busi_line_code,jdbcType=VARCHAR}, -->
 			#{busi_line_id,jdbcType=VARCHAR},
-			str_to_date('${join_date}','%Y-%m-%d'),
-			#{employee_id,jdbcType=VARCHAR},
-			str_to_date('${leave_date}','%Y-%m-%d'),
-			#{cert_id,jdbcType=VARCHAR},
-			str_to_date('${born_date}','%Y-%m-%d'),
+			#{id_card,jdbcType=VARCHAR},
+			now(),
 			#{gender_code,jdbcType=VARCHAR},
 			#{ethnicity_code,jdbcType=VARCHAR},
-			#{edu_back_code,jdbcType=VARCHAR},
-			#{user_mobile,jdbcType=VARCHAR},
-			#{user_address,jdbcType=VARCHAR},
-			#{user_email,jdbcType=VARCHAR},
-			#{postal,jdbcType=VARCHAR},
-			str_to_date('${begin_date}','%Y-%m-%d'),
-			str_to_date('${end_date}','%Y-%m-%d'),          
-			#{user_status,jdbcType=VARCHAR},
-			#{remark,jdbcType=VARCHAR}
-				
+			#{email,jdbcType=VARCHAR},
+			now(),
+			now()
 			)
 	</insert>
 	
@@ -145,7 +124,7 @@
 	<!-- 修改用户信息 -->
 	<update id="updateUser" parameterType="SysUserInfo">
 		update opm_sys_user_info set
-			password            = #{password,jdbcType=VARCHAR},
+			paswd            = #{password,jdbcType=VARCHAR},
 			user_name           = #{user_name,jdbcType=VARCHAR},
 			owner_org_id        = #{owner_org_id,jdbcType=VARCHAR},
 			bank_org_id         = #{bank_org_id,jdbcType=VARCHAR},
@@ -198,8 +177,8 @@
 	</select>
 	
 	<!-- 修改用户密码 -->
-	<update id="modifyPassword" parameterType="map">
-		update opm_sys_user_info set password=#{password} where user_id=#{user_id}
+	<update id="modifypaswd" parameterType="map">
+		update opm_sys_user_info set paswd=#{password} where user_id=#{user_id}
 	</update>
 	
 		<!-- 删除用户与用户角色关系 -->
@@ -231,7 +210,7 @@
 	
 	<!-- 添加用户角色 -->
 	<insert id="addUserRole" parameterType="map">
-		insert into opm_sys_user_role(user_id,role_id)values(#{user_id},#{role_id})
+		insert into opm_sys_user_role(user_id,role_uuid)values(#{user_id},#{role_id})
 	</insert>
 	
 	<!-- 根据用户ID获取用户角色 -->
@@ -296,7 +275,7 @@
 	
 	<select id="checkPassword" parameterType = "SysUserInfo" resultType="int">
 		<include refid="common.totalCountHead"/>
-		select * from opm_sys_user_info t where t.user_id = #{user_id} and t.password = #{password}
+		select * from opm_sys_user_info t where t.user_id = #{user_id} and t.paswd = #{password}
 		<include refid="common.totalCountEnd"/>
 	</select>
 	

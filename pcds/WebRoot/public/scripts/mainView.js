@@ -122,6 +122,7 @@ function checkPassword(oldPwd,newPwd,verPwd){
 
 
 function logout_ (){
+
 	Ext.Ajax.request({
 			url : pathUrl + '/loginAjax.do?method=doLogout',
 			method: 'POST',

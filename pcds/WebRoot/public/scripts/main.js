@@ -225,15 +225,16 @@ function onclose(){
 
 
 function logout(){
+	alert("--"+casUrl)
 	Ext.Ajax.request({
-		url : pathUrl + '/loginAjax.do?method=doLogout',
+		url : pathUrl + '/login.do?method=doLogout',
 		method: 'POST',
 			params: {},
 			failure:function(response, options){
 				Ext.MessageBox.alert(response.responseText);
 			}, 
 			success:function(response, options){
-				window.location.href= pathUrl + '/login.jsp';
+				window.location.href= casUrl;
 			}
 	});
 }

@@ -196,7 +196,7 @@
 	           '8888' bank_org_id, 
 	           '总行' as owner_org_name,
 	           '总行' as bank_org_name 
-	      from sys_user_info t 
+	      from opm_sys_user_info t
 			 where t.user_id=#{userID}
 	</select>
 	

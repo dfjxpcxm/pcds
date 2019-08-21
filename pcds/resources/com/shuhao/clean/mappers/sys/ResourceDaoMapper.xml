@@ -32,7 +32,7 @@
 	  where resource_id in (
 	    select 
 	      d.resource_id
-		    from sys_user_info b,sys_user_role_rela c,sys_role_resource_rela d
+		    from opm_sys_user_info b,sys_user_role_rela c,sys_role_resource_rela d
 	    where b.user_id = #{user_id}
 	      and b.user_id = c.user_id
 	      and c.role_id = d.role_id
@@ -46,7 +46,7 @@
 	  where resource_id in (
 	    select 
 	      d.resource_id
-		    from sys_user_info b,opm_sys_user_role c,sys_role_resource_rela d
+		    from opm_sys_user_info b,opm_sys_user_role c,sys_role_resource_rela d
 	    where b.user_id = #{user_id}
 	      and b.user_id = c.user_id
 	      and c.role_uuid = d.role_id

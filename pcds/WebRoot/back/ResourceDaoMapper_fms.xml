@@ -6,7 +6,7 @@
 	
 	<!-- 获取所有菜单  opm_sys_resource-->
 	<select id="getAllResource" resultType="SysResourceInfo">
-		select a.* from sys_resource a 
+		select a.* from opm_sys_resource a
 	</select>
 	
 
@@ -24,11 +24,11 @@
 	<!-- 20131023修改  合并上用户特殊权限机构中的菜单资源 -->
 	<select id="getUserResource" parameterType="SysUserInfo" resultType="SysResourceInfo">
 	select a.*
-	  from sys_resource a
+	  from opm_sys_resource a
 	  where uuid in (
 	    select 
 	      d.resource_uuid
-	    from sys_user_info b,sys_user_role c,sys_role_grant d
+	    from opm_sys_user_info b,sys_user_role c,sys_role_grant d
 	    where b.user_id = #{user_id}
 	      and b.user_id = c.user_id
 	      and c.role_uuid = d.role_uuid
