@@ -143,11 +143,7 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 		//获取前端登陆参数
 //		String user_id = request.getParameter("user_id");
 //		String password = request.getParameter("password");
-//		String user_id = "00000";
-//		String user_id = "000001";
-		String password ="password";
         String user_id ="";
-
 
 		//获取前端登陆参数
 		String userId = getCasLoginUsername();

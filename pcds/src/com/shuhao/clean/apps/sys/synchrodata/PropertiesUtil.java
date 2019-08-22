@@ -10,7 +10,7 @@ import java.util.Properties;
 public class PropertiesUtil {
 
 
-	private static final String properiesName = "spring/jdbc_oracle.properties";
+	private static final String properiesName = "spring/jdbc.properties";
 	private static Properties prop = new Properties();
 	static {
 		InputStream is = null;

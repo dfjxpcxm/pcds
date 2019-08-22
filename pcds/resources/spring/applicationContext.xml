@@ -23,7 +23,7 @@
 	<!-- 加载jdbc.properties 
 	<context:property-placeholder location="classpath:spring/jdbc_oracle_local.properties" ignore-unresolvable="true"/>
 	-->
-	<context:property-placeholder location="classpath:spring/jdbc_oracle.properties" ignore-unresolvable="true"/>
+	<context:property-placeholder location="classpath:spring/jdbc.properties" ignore-unresolvable="true"/>
 	 
 	<!-- 强制CGLIB代理 -->
 	<aop:config proxy-target-class="true" />
