@@ -143,28 +143,28 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 		//获取前端登陆参数
 //		String user_id = request.getParameter("user_id");
 //		String password = request.getParameter("password");
-        String user_id ="";
+//        String user_id ="";
 
 		//获取前端登陆参数
 		String userId = getCasLoginUsername();
-		if(null == user_id || "".equals(user_id) || "null".equals(user_id)){
-			user_id = CookieUtil.getValue(request, SynchronizedDataConstants.CAS_LOGIN_USER);
-			if (StringUtil.isNullStr(user_id)){
-				user_id = "admin";
+		if(null == userId || "".equals(userId) || "null".equals(userId)){
+			userId = CookieUtil.getValue(request, SynchronizedDataConstants.CAS_LOGIN_USER);
+			if (StringUtil.isNullStr(userId)){
+				userId = "admin";
 				System.out.println("*********************取得cas用户名失败，设置为默认管理员【admin】！------------------");
 			}
 		}
 
 		//根据输入用户名查询用户列表
-		SysUserInfo user = userService.findUserById(user_id);
+		SysUserInfo user = userService.findUserById(userId);
 		if(user == null){
-			List<Map<String,Object>> list = this.getPortalUser(user_id);
+			List<Map<String,Object>> list = this.getPortalUser(userId);
 			if(null !=list && list.size()>0){
 				//同步用户数据
 				getUserInfo(list);
 			}
 
-			user = userService.findUserById(user_id);
+			user = userService.findUserById(userId);
 		}
 		//JSON返回结果Map
 		Map<String, Object> results = new HashMap<String, Object>();
@@ -173,8 +173,8 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 //			SysUserInfo user = userService.findUserById(user_id);
 			//判断用户不存在的情况
 			if(user == null){
-				log.info("不存在用户["+user_id+"]");
-				results.put("info", "不存在用户["+user_id+"]");
+				log.info("不存在用户["+userId+"]");
+				results.put("info", "不存在用户["+userId+"]");
 				return  null;
 			}
 			//验证密码是否一致
