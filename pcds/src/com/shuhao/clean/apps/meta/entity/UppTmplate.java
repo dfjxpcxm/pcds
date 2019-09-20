@@ -155,6 +155,9 @@ public class UppTmplate implements ToExtTreeNode{
 		ExtTreeNode node = new ExtTreeNode();
 		node.setId(this.tmpl_id);
 		String hasPublic = this.status_cd.equals("02") ? "" : "*";
+		if(this.enter_type_cd ==null || "".equals(this.enter_type_cd)) {
+			this.enter_type_cd = "02";
+		}
 		node.setText(hasPublic + this.template_name + (this.template_type_cd.equals("01")?"[目录]":(this.enter_type_cd.equals("01")?"[全部补录]":"[部分补录]")));
 		node.setLeaf(false);
 		node.setIconCls(getIcon(this.template_type_cd));
