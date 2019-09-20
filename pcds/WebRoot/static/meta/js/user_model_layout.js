@@ -148,7 +148,7 @@ var BlmbCombo=function(config){
 	                height: height,
 	                bodyStyle: 'padding:2px;',
 	                rootVisible: true,
-	                loader: new Ext.tree.TreeLoader({dataUrl: pathUrl + '/flow/listAllTmpl/no'}),
+	                loader: new Ext.tree.TreeLoader({dataUrl: pathUrl + '/flow/listAllTmpl/yes'}),
 	                root :new Ext.tree.AsyncTreeNode({
 	                    text: '补录模板',
 	                    iconCls:'folder_table',

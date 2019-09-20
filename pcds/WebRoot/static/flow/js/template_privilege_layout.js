@@ -262,7 +262,7 @@ Ext.onReady(function(){
 		lines:false,
 		autoScroll:true,
 		bodyStyle : 'padding:5px 5px',
-		loader: new Ext.tree.TreeLoader({dataUrl: pathUrl + '/flow/listAllTmpl/no'}),
+		loader: new Ext.tree.TreeLoader({dataUrl: pathUrl + '/flow/listAllTmpl/yes'}),
 		root :new Ext.tree.AsyncTreeNode({
 			text: '补录模板',
 			iconCls:'folder_table',
