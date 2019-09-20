@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import com.rx.util.tree.TreeStore;
+import com.shuhao.clean.apps.sys.entity.SysOrgInfo;
 import com.shuhao.clean.apps.sys.entity.SysUserInfo;
 import com.shuhao.clean.utils.Tree;
 
@@ -26,8 +27,7 @@ public interface IUserService {
 	public void addUser(SysUserInfo user)throws Exception;
 
 	public void addUserRoleInfo(String userId,String roleId) throws Exception;
-
-
+	
 	public void updataUser (SysUserInfo user)throws Exception;
 	
 	//删除用户
@@ -93,4 +93,16 @@ public interface IUserService {
 	
 	//获得当前用的菜单列表   用于用户登陆初始化用户权限菜单
 	public Map<Integer,Tree> getLoginUserResource(Map<String,Object> paramMap) throws Exception;
+
+
+	public boolean findOrgInfoById(String orgid) throws Exception;
+
+
+
+	public void updataOrg(SysOrgInfo org)throws Exception;
+
+	public void addUserOrgInfo(String userId,String orgid) throws Exception;
+
+
+	public void addOrg (SysOrgInfo org)throws Exception;
 }
