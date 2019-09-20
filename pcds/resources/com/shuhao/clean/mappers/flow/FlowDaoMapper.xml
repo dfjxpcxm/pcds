@@ -312,7 +312,7 @@
 			t.prt_tmpl_id,
 			t.template_name,
 			t.template_desc,
-			case when b.tmpl_id is null then t.template_type_cd else '03' end template_type_cd,
+			case when t.tmpl_id is  not null then t.template_type_cd else '03' end template_type_cd,
 			t.enter_type_cd,
 			t.create_user_id,
 			t.create_time,
