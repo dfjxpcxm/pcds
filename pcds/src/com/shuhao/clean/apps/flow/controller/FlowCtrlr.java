@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 import com.shuhao.clean.apps.flow.service.FlowService;
+import com.shuhao.clean.apps.flow.util.JsonUtil;
 import com.shuhao.clean.base.BaseCtrlr;
 import com.shuhao.clean.toolkit.log.annotation.FunDesc;
 import com.shuhao.clean.toolkit.log.annotation.UseLog;
@@ -542,13 +545,15 @@ public class FlowCtrlr extends BaseCtrlr {
 		Map<String,Object> param = this.getRequestParam();
 		param.put("login_user_id", this.getCurrentUser().getUser_id());
 		String tmpl_id = GlobalUtil.getStringValue(param, "tmpl_id");
+		String jsonStr ="";
 		if (null == tmpl_id || "".equals(tmpl_id))
         	tmpl_id = "root";
 		param.put("tmpl_id", tmpl_id);
 		try {
 			param.put("queryAll", queryAll);
 			ExtTreeNode treeNode = this.flowService.getMyTmpl(param);
-			doExtTreeJSONResponse(treeNode.getChildren(), response);
+			jsonStr = JsonUtil.toJson(treeNode.getChildren());
+			doExtTreeJSONResponseJson(jsonStr, response);
 		} catch (Exception e) {
 			e.printStackTrace();
 			List<ExtTreeNode> eList = new ArrayList<ExtTreeNode>();
@@ -557,10 +562,17 @@ public class FlowCtrlr extends BaseCtrlr {
 			treeNode.setText("展示指标树失败:" + e.getMessage());
 			treeNode.setLeaf(true);
 			eList.add(treeNode);
-			doExtTreeJSONResponse(eList, response);
+			jsonStr = JsonUtil.toJson(eList);
+			doExtTreeJSONResponseJson(jsonStr, response);
 		}
 	}
-	
+
+
+
+	public void doExtTreeJSONResponseJson( String json, HttpServletResponse response)throws Exception{
+		response.setContentType("text/html;charset=utf-8");
+		response.getWriter().write(json);
+	}
 	/**
 	 * 查询差额信息
 	 * @return
