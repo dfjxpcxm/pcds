@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.shuhao.clean.utils.exttree.ExtTreeNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -286,5 +287,30 @@ public class SelectorCtrlr extends BaseCtrlr {
 		Map<String, Object> params =  this.getRequestParam();
 		List<Map<String, Object>> dataList=selectorService.queryUppDimSource(params);
 		return doJSONResponse(dataList);		 
+    }
+
+
+    /**
+     * 查询按钮功能
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="listBankOrganization")
+/*    @ResponseBody*/
+    public void listBankOrganization() throws Exception {
+        Map<String, Object> params = this.getRequestParam();
+        try {
+            ExtTreeNode treeNode = selectorService.listBankOrganization(params);
+            doExtTreeJSONResponse(treeNode.getChildren(), response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            List<ExtTreeNode> eList = new ArrayList<ExtTreeNode>();
+            ExtTreeNode treeNode = new ExtTreeNode();
+            treeNode.setId("errorRootId");
+            treeNode.setText("展示机构树失败:" + e.getMessage());
+            treeNode.setLeaf(true);
+            eList.add(treeNode);
+            doExtTreeJSONResponse(eList, response);
+        }
     }
 }

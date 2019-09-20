@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.shuhao.clean.apps.meta.entity.UppMetadata;
 import com.shuhao.clean.utils.PageResult;
+import com.shuhao.clean.utils.exttree.ExtTreeNode;
 
 
 /**
@@ -171,4 +172,8 @@ public interface ISelectorService {
 	 * @throws Exception
 	 */
 	public List<Map<String, Object>> queryUppDimSource(Map<String, Object> paramMap)throws Exception;
+
+
+
+	public ExtTreeNode listBankOrganization(Map<String, Object> paramMap)throws Exception;
 }

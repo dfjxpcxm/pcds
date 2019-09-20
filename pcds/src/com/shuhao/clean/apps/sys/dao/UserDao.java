@@ -1,9 +1,11 @@
 package com.shuhao.clean.apps.sys.dao;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.shuhao.clean.annotation.MyBatisDao;
+import com.shuhao.clean.apps.sys.entity.SysOrgInfo;
 import com.shuhao.clean.apps.sys.entity.SysResourceInfo;
 import com.shuhao.clean.apps.sys.entity.SysUserInfo;
 
@@ -77,4 +79,14 @@ public interface UserDao {
 	public void deleteRoleByUserIdAndBankOrgId(Map<String, Object> paramMap) throws Exception;
 	
 	public void deleteInitPage(String userID) throws Exception;
+
+
+	public int findOrgInfoById(String orgid) throws Exception;
+
+
+	public void updataOrg(SysOrgInfo org) throws Exception;
+	public void addOrg(SysOrgInfo org) throws Exception;
+	public void addUserOrgInfo(Map<String, Object> paramMap) throws Exception;
+
+
 }

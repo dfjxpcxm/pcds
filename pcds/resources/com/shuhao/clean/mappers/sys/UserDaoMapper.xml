@@ -352,4 +352,25 @@
 				and	b.bank_org_id = #{bank_id}
 				)
 	</delete>
+
+
+	<select id="findOrgInfoById" parameterType="string" resultType="int">
+		select count(1)  cnt from dmd_bank_inter_org  where bank_org_id = #{orgid}
+	</select>
+
+
+    <update id="updataOrg" parameterType="SysUserInfo">
+		update dmd_bank_inter_org set bank_org_name=#{bank_org_name},parent_bank_org_id=#{parent_bank_org_id} where bank_org_id=#{bank_org_id}
+	</update>
+
+
+
+	<insert id="addOrg"  parameterType="SysUserInfo">
+		insert into dmd_bank_inter_org(bank_org_id,bank_org_name,parent_bank_org_id) values(#{bank_org_id},#{bank_org_name},#{parent_bank_org_id})
+	</insert>
+
+
+    <update id="addUserOrgInfo" parameterType="map">
+		update opm_sys_user_info set BANK_ORG_ID=#{bank_org_id},OWNER_ORG_ID=#{bank_org_id} where user_id=#{user_id}
+	</update>
 </mapper>

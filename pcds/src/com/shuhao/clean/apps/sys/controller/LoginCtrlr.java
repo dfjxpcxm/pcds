@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.shuhao.clean.apps.sys.entity.SysOrgInfo;
 import com.shuhao.clean.apps.sys.synchrodata.CookieUtil;
 import com.shuhao.clean.apps.sys.synchrodata.Dom4jUtil;
 import com.shuhao.clean.apps.sys.synchrodata.PropertiesUtil;
@@ -162,6 +163,12 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 			if(null !=list && list.size()>0){
 				//同步用户数据
 				getUserInfo(list);
+			}
+			//同步机构数据
+			List<Map<String,Object>> orgList = this.getPortalOrgInfo(userId);
+			if(null !=orgList && orgList.size()>0){
+				//同数据
+				getOrgInfo(orgList);
 			}
 
 			user = userService.findUserById(userId);
@@ -359,6 +366,17 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 		return retList;
 	}
 
+
+	public List<Map<String,Object>> getPortalOrgInfo(String user_id) throws Exception{
+		WebClient web = new WebClient();
+		Map<String,Object> mp = new HashMap<String, Object>();
+		mp.put("arg0",user_id);
+		String operationName = SynchronizedDataConstants.GET_ONE_ORG_WSDL_OPERATION_NAME;
+		String retXml = web.getWsdlResultByCode(mp,operationName); //传入参数名，参数值，方法名
+		List<Map<String,Object>> retList = Dom4jUtil.readDom4jXml(retXml);
+		return retList;
+	}
+
 	public static String getParamsByReq(HttpServletRequest request, String name) {
 		ServletContext servletContext = request.getSession().getServletContext();
 		String val = servletContext.getInitParameter(name);
@@ -376,12 +394,33 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 		}
 	}
 
+
+
+
+
+	public void getOrgInfo(List<Map<String, Object>> retList) throws Exception{
+		for (int i = 0; i < retList.size(); i++) {
+			if (ifOrg((String) retList.get(i).get("dep_global_id"))){
+				userService.updataOrg(setOrg(retList.get(i)));
+			}else {
+				userService.addOrg(setOrg(retList.get(i)));
+				userService.addUserOrgInfo((String) retList.get(i).get("user_name"),(String) retList.get(i).get("DEP_GLOBAL_ID"));
+			}
+		}
+	}
+
 	public boolean ifUser(String user_name) throws Exception{
 		SysUserInfo  userInfo = userService.findUserById(user_name);
 		if(userInfo != null ){
 			return true;
 		}
 		return false;
+	}
+
+
+	public boolean ifOrg(String orgid) throws Exception{
+		boolean bool = userService.findOrgInfoById(orgid);
+		return bool;
 	}
 
 
@@ -392,9 +431,18 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 		user.setTelephone((String) map.get("user_tel"));
 		user.setAddress((String) map.get("user_addr"));
 		user.setPassword("X03MO1qnZdYdgyfeuILPmQ==");
-		user.setBank_org_id("101");
-		user.setBank_org_name("8888");
+		user.setBank_org_id("350010000000");
+		user.setOwner_org_name("350010000000");
 		return user;
+	}
+
+
+	public SysOrgInfo setOrg(Map<String, Object> map){
+		SysOrgInfo org = new SysOrgInfo();
+		org.setBank_org_id((String) map.get("dep_global_id"));
+		org.setBank_org_name((String) map.get("dep_name"));
+		org.setParent_bank_org_id((String) map.get("sup_dep_global_id"));
+		return org;
 	}
 
 

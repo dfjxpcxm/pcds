@@ -40,6 +40,10 @@ public class SynchronizedDataConstants {
 	public final static String GET_BATCHUSER_WSDL_OPERATION_NAME = "getUserBatchDataByAppName";
 
 
+	public final static String GET_ONE_ORG_WSDL_OPERATION_NAME = "getOrgDataByUserID";
+
+	public final static String GET_BATCH_ORG_WSDL_OPERATION_NAME = "getOrgBatchData";
+
 	public final static String GET_ONEUSER_START_PARAM_KEY = "arg0";
 	public final static String GET_ONEUSER_END_PARAM_KEY = "arg1";
 

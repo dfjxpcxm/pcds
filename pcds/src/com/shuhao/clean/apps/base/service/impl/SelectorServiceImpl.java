@@ -3,6 +3,14 @@ package com.shuhao.clean.apps.base.service.impl;
 import java.util.List;
 import java.util.Map;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import com.shuhao.clean.apps.sys.entity.SysOrgInfo;
+import com.shuhao.clean.utils.exttree.ExtTreeNode;
+import com.shuhao.clean.utils.exttree.ExtTreeUtils;
+import com.shuhao.clean.utils.exttree.OrgTreeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +20,9 @@ import com.shuhao.clean.apps.meta.entity.UppMetadata;
 import com.shuhao.clean.base.BaseService;
 import com.shuhao.clean.utils.GlobalUtil;
 import com.shuhao.clean.utils.PageResult;
+
+import com.shuhao.clean.utils.exttree.ExtTreeNode;
+import com.shuhao.clean.utils.exttree.OrgTreeUtils;
 
 
 /**
@@ -196,5 +207,11 @@ public class SelectorServiceImpl extends BaseService implements ISelectorService
 	public List<Map<String, Object>> queryUppDimSource(Map<String, Object> paramMap) throws Exception {
 		return toLowerMapList(selectorDao.queryUppDimSource(paramMap));
 	}
-	
+
+	@Override
+	public ExtTreeNode listBankOrganization(Map<String, Object> paramMap) throws Exception {
+		List<SysOrgInfo> orgInfo = selectorDao.listBankOrganization(paramMap);
+		return OrgTreeUtils.listProjectTree(orgInfo, "根节点");
+	}
+
 }

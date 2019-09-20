@@ -134,5 +134,13 @@
 		</if>
 		order by dim_cd
 	</select>
+
+
+	<select id="listBankOrganization" parameterType="map" resultType="com.shuhao.clean.apps.sys.entity.SysOrgInfo">
+		select bank_org_id,bank_org_name,parent_bank_org_id from  dmd_bank_inter_org
+		order by bank_org_id
+	</select>
+
+
 	
 </mapper>

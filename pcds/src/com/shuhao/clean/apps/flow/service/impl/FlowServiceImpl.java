@@ -179,6 +179,7 @@ public class FlowServiceImpl extends BaseService implements FlowService {
 		if(GlobalUtil.isNull(table_name)||GlobalUtil.isNull(product_id)){
 			return "";
 		}else{
+			
 			param.put("table_name", table_name);
 			param.put("product_id", product_id);
 			return this.flowDao.queryTotalCe(param);

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.shuhao.clean.annotation.MyBatisDao;
 import com.shuhao.clean.apps.meta.entity.UppMetadata;
+import com.shuhao.clean.apps.sys.entity.SysOrgInfo;
 
 /**
  * 查询条件控件Dao
@@ -163,5 +164,9 @@ public interface SelectorDao {
 	 * @throws Exception
 	 */
 	public List<Map<String, Object>> queryUppDimSource(Map<String, Object> paramMap) throws Exception;
+
+	public List<SysOrgInfo> listBankOrganization(Map<String, Object> paramMap) throws Exception;
+
+
 
 }

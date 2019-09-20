@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
+import com.shuhao.clean.apps.sys.entity.SysOrgInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -262,5 +263,35 @@ private static String totalNum = "0";
 		}
 		return treeStore;
 	}
-	
+
+	@Override
+	public boolean findOrgInfoById(String orgid) throws Exception {
+		boolean bool = false;
+		int cnt = userDao.findOrgInfoById(orgid);
+		if(cnt >0){
+			bool = true;
+		}
+		return bool;
+	}
+
+	@Override
+	public void updataOrg(SysOrgInfo org) throws Exception {
+		userDao.updataOrg(org);
+	}
+
+	@Override
+	public void addUserOrgInfo(String userId, String orgid) throws Exception {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("user_id", userId);
+		paramMap.put("bank_org_id", orgid);
+		userDao.addUserOrgInfo(paramMap);
+
+	}
+
+	@Override
+	public void addOrg(SysOrgInfo org) throws Exception {
+		userDao.addOrg(org);
+
+	}
+
 }

@@ -324,7 +324,9 @@
 		  from upp_template t
 		  left join upp_template b on b.prt_tmpl_id = t.tmpl_id and b.rela_metadata_names is not null
 		  where 1=1
-		<if test="queryAll != null and queryAll == 'no'">
+		<!-- <if test="queryAll != null and queryAll == 'no'"> -->
+		
+		<if test='queryAll== "no" or "no".equals(queryAll)'>
 			and t.tmpl_id not in (
 			select a.tmpl_id from upp_template a
 			where a.rela_metadata_names is not null
@@ -335,8 +337,8 @@
 			and t.tmpl_id in (
 	        select tmpl_id from upp_template where template_type_cd='01'
 	        union all
-	        select a.tmpl_id from upp_template a,upp_user_template b 
-            where a.tmpl_id=b.tmpl_id and b.cust_mgr_id=#{login_user_id} and a.status_cd='02')
+	        select a.tmpl_id from upp_template a left join upp_user_template b 
+            on a.tmpl_id=b.tmpl_id and b.cust_mgr_id=#{login_user_id} where a.status_cd='02')
 		</if>
 		order by t.template_type_cd,t.display_order
 	</select>
