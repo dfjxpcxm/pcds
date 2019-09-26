@@ -1,8 +1,11 @@
 package com.shuhao.clean.apps.meta.dao.impl;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,26 +129,25 @@ public class BckTrackingMetaDaoImpl extends BaseDao implements
 			if("sql".equals(key) ||"ispage".equals(key) || "action_type".equals(key)){
 				continue;
 			}
-			
 			String value = "";
 			if (obj != null){
 				value = String.valueOf(obj);
-				if (value.indexOf(",")>-1) {
-					value = value.replace(",", "");
-				} 
+//				if (value.indexOf(",")>-1) {
+//					value = value.replace(",", "");
+//				}
 				
 				if (key.equals("start") || key.equals("limit")) {
-					sql = sql.replace("#"+key, value);
+					sql = sql.replaceAll("#"+key.concat("\\b"), value);
 				}else{
 					//如果是查询
 					if(actionType!=null && actionType.equals("query")){
-						sql = sql.replace("#"+key, value);
+						sql = sql.replaceAll("#"+key.concat("\\b"), value);
 					}else{
-						sql = sql.replace("#"+key, "'"+value+"'");
+						sql = sql.replaceAll("#"+key.concat("\\b"), "'"+value+"'");
 					}
 				}
 			}else{
-				sql = sql.replace("#"+key,"");
+				sql = sql.replaceAll("#"+key.concat("\\b"),"");
 			}
 		}
 		return sql;

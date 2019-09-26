@@ -1,16 +1,12 @@
 package com.shuhao.clean.utils;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -594,4 +590,36 @@ public class Read2007ExcelWrapper {
 		}
 		return head;
 	}
+
+
+	//读取csv
+	public static List<Map<String, List<List<String>>>> readCsv(String fullFileName) {
+		String pfileName = fullFileName.substring(fullFileName.lastIndexOf("/")+1);
+		List<Map<String, List<List<String>>>> dataList = new ArrayList<>();
+		Map<String,List<List<String>>> sheetMap = new HashMap<String,List<List<String>>>();
+		List<List<String>> recordList = new ArrayList<List<String>>();
+		try {
+			String record;
+			String enc = "UTF-8";
+			BufferedReader file = new BufferedReader(new InputStreamReader(new FileInputStream(fullFileName), enc));
+			// 遍历数据行并存储在名为records的ArrayList中，每一行records中存储的对象为一个String数组
+			while ((record = file.readLine()) != null) {
+				String fields[] = record.trim().split(",(?=([^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*$)",-1);
+				List<String> rowList = new ArrayList<String>();
+				for (String s : fields){
+					s = s.replaceAll("\"","");
+					rowList.add(s);
+				}
+				recordList.add(rowList);
+			}
+			sheetMap.put(pfileName.substring(0,pfileName.lastIndexOf(".")),recordList);//截取文件名
+			dataList.add(sheetMap);
+			// 关闭文件
+			file.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return dataList;
+	}
+
 }

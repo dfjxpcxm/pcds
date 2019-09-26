@@ -269,8 +269,8 @@ function doImportData(templateId,metadata_id,button_id,relaValues){
 			}
 			
 			var fileName = filePath.substr(filePath.lastIndexOf('.'));
-			if(fileName != '.xls' && fileName != '.xlsx'){
-				Ext.Msg.alert('提示信息','请选择以下类型的文件  [ .xls , .xlsx ] 导入。');
+			if(fileName != '.xls' && fileName != '.csv'){//&& fileName != '.xlsx'
+				Ext.Msg.alert('提示信息','请选择以下类型的文件  [ .xls ,.csv ] 导入。');
 				return ;
 			}
 			
