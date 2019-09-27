@@ -122,7 +122,7 @@ function addDataBase(parentNode, md_cate_cd) {
 				xtype : 'numberfield',
 				name : 'display_order',
 				fieldLabel : '显示顺序',
-				allowBlank : true,
+				allowBlank : false,
 				anchor : formItemAnchor
 			}]
 		}, {
@@ -276,7 +276,7 @@ function addUser(parentNode, md_cate_cd) {
 				xtype : 'numberfield',
 				name : 'display_order',
 				fieldLabel : '显示顺序',
-				allowBlank : true,
+				allowBlank : false,
 				anchor : '91%'
 			}]
 	});
@@ -362,7 +362,7 @@ function addTheme(parentNode, md_cate_cd) {
 				xtype : 'numberfield',
 				name : 'display_order',
 				fieldLabel : '显示顺序',
-				allowBlank : true,
+				allowBlank : false,
 				anchor : '91%'
 			}]
 	});
@@ -521,7 +521,7 @@ function addTable(parentNode, md_cate_cd) {
 				xtype : 'numberfield',
 				name : 'display_order',
 				fieldLabel : '显示顺序',
-				allowBlank : true,
+				allowBlank : false,
 				anchor : '91%'
 			}]
 	});
@@ -653,7 +653,7 @@ function addColumn(parentNode, md_cate_cd) {
 				xtype : 'numberfield',
 				name : 'display_order',
 				fieldLabel : '显示顺序',
-				allowBlank : true,
+				allowBlank : false,
 				anchor : '91%'
 			}]
 	});
@@ -732,7 +732,7 @@ function addExcel(parentNode, md_cate_cd) {
 				xtype : 'numberfield',
 				name : 'display_order',
 				fieldLabel : '显示顺序',
-				allowBlank : true,
+				allowBlank : false,
 				anchor : '91%'
 			}]
 	});

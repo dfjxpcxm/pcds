@@ -135,18 +135,21 @@ function addPageField(){
 				name : 'max_value',
 				id : 'max_value',
 				fieldLabel : '最大值',
+				allowBlank : false,
 				anchor : formItemAnchor
 			}, {
 				xtype : 'textfield',
 				name : 'min_value',
 				id : 'min_value',
 				fieldLabel : '最小值',
+				allowBlank : false,
 				anchor : formItemAnchor
 			}, {
 				xtype : 'textfield',
 				name : 'max_length',
 				id : 'max_length',
 				fieldLabel : '最大长度',
+				allowBlank : false,
 				anchor : formItemAnchor
 			}
 			]
@@ -262,6 +265,7 @@ function addPageField(){
 				xtype : 'textfield',
 				name : 'display_order',
 				fieldLabel : '显示顺序',
+				allowBlank : false,
 				anchor : formItemAnchor
 			}]
 		}

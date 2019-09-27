@@ -751,7 +751,7 @@ function addPageField(parentNode, md_cate_cd){
 				anchor : formItemAnchor
 			}, {
 				xtype : 'combo',
-				fieldLabel : '是否隐藏',
+				fieldLabel : '是否隐藏11',
 				id:'isHidden',
 				name:'is_hidden',
 				displayField : 'text',
