@@ -8,7 +8,7 @@
 	<select id="queryRelaMetadata" parameterType="map" resultType="map">
 		select 
 			a.metadata_id rela_metadata_id,
-			a.metadata_name||'['||a.metadata_desc||']' rela_metadata_name
+			concat(a.metadata_name,'[',a.metadata_desc,']') rela_metadata_name
 		from upp_metadata a
 		where a.md_cate_cd = #{md_cate_cd,jdbcType=VARCHAR}
 		  and a.prt_metadata_id = #{prt_metadata_id,jdbcType=VARCHAR}

@@ -211,7 +211,7 @@
 	<!--  查询关联表的可配置字段 -->
 	<select id="queryRelaTableCols" parameterType="map" resultType="map">
 		select a.column_id,
-		       substr(a.column_name || ' ' || a.column_desc,1,length(a.column_name)+10) column_name
+		       substr(CONCAT(a.column_name ,'[', a.column_desc,']'),1,length(a.column_name)+10) column_name
 		  from upp_column a
 		 where 1 = 1
 		   and a.column_id in
@@ -227,7 +227,7 @@
 		                                 ))
 		 union all
 		 select m.column_id,
-		        m.column_name || ' ' || m.column_desc column_name
+		        CONCAT(m.column_name,'[',m.column_desc,']') as column_name
 		 from upp_column m,upp_dic_fn_rela n
 		 
 		 where m.column_id = n.db_obj_id

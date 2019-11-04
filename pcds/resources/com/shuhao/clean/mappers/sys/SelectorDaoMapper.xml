@@ -111,8 +111,8 @@
 	<!-- 查询元数据按钮功能-->
 	<select id="queryUppButtonFunction" parameterType="map" resultType="hashmap">
 		select button_func_cd,
-		button_func_name||' ['||button_func_desc||']' as button_func_name
-		from upp_button_function 
+		CONCAT(button_func_name,' [',button_func_desc,']') as button_func_name
+		from upp_button_function
 		order by button_func_cd
 	</select>
 	
@@ -126,7 +126,7 @@
 	
 	<!-- 查询维度-->
 	<select id="queryUppDimSource" parameterType="map" resultType="hashmap">
-		select dim_cd,'['||dim_cd||']'||dim_name  dim_name
+		select dim_cd,concat('[',dim_cd,']',dim_name) as dim_name
 		from upp_dim_source
 		where 1=1
 		<if test="is_tree != null and is_tree != ''">

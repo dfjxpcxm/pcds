@@ -141,7 +141,7 @@ function addPageField(){
 				xtype : 'textfield',
 				name : 'min_value',
 				id : 'min_value',
-				fieldLabel : '最小值',
+				fieldLabel : '最小值111',
 				allowBlank : false,
 				anchor : formItemAnchor
 			}, {
@@ -513,18 +513,21 @@ function editPageField(field_id){
 				name : 'max_value',
 				id : 'max_value',
 				fieldLabel : '最大值',
+				allowBlank : false,
 				anchor : formItemAnchor
 			}, {
 				xtype : 'textfield',
 				name : 'min_value',
 				id : 'min_value',
 				fieldLabel : '最小值',
+				allowBlank : false,
 				anchor : formItemAnchor
 			}, {
 				xtype : 'textfield',
 				name : 'max_length',
 				id : 'max_length',
 				fieldLabel : '最大长度',
+				allowBlank : false,
 				anchor : formItemAnchor
 			}
 			]
@@ -634,6 +637,7 @@ function editPageField(field_id){
 				xtype : 'textfield',
 				name : 'display_order',
 				fieldLabel : '显示顺序',
+				allowBlank : false,
 				anchor : formItemAnchor
 			}]
 		}
@@ -643,7 +647,7 @@ function editPageField(field_id){
 	
 	var updateMetadataWindow = new Ext.Window({
 		layout : 'fit',
-		title : '编辑表单字段',
+		title : '字段',
 		buttonAlign : 'center',
 		modal : true,
 		width : 650,
