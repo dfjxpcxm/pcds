@@ -99,7 +99,7 @@
 	<select id="getUserListCount" parameterType="map" resultType="int">
 	    select count(1) from (
 			<include refid="getUserSql"/>
-		)
+		) as c
 	</select>
 	
 	<select id="getAllotedUserList" parameterType="map" resultType="map">
@@ -166,12 +166,12 @@
 	
 	<select id="deleteDsInfo" parameterType="QueryDs">
 		<![CDATA[
-			BEGIN
+			BEGIN;
 				delete from tool_cq_ds where ds_id = #{ds_id};
 				delete from tool_cq_ds_meta where ds_id = #{ds_id};
 				delete from tool_cq_user_ds_cmeta where ds_id = #{ds_id};
 				delete from tool_cq_user_ds where ds_id = #{ds_id};
-			END;
+			commit;
 		]]>
 	</select>
 </mapper>
