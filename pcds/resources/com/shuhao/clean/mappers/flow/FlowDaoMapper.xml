@@ -518,7 +518,7 @@
 		  from opm_sys_user_info a, dmd_bank_relation b
 		 where a.bank_org_id = b.bank_org_id
 		   and b.bank_rela_type_cd = '00'
-		   and b.parent_bank_org_id = #{login_org_id}
+		   and (b.parent_bank_org_id = #{login_org_id} or b.bank_org_id = #{login_org_id})
 		<if test="cust_mgr_id != null and cust_mgr_id != ''">
 			and (cust_mgr_id like '%${cust_mgr_id}%' or user_name like '%${cust_mgr_id}%')
 		</if>

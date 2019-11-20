@@ -49,7 +49,7 @@
 	</div>
 	<div class="r_bg_r">
 		<div class="operator">
-			<div class="opt_item mpsw" onclick="modifyPassword()">修改密码</div>
+			<%--<div class="opt_item mpsw" onclick="modifyPassword()">修改密码</div>--%>
 			<div class="opt_item exit" onclick="logout()">退出系统</div>
 		</div>
 		<div class="logininfo">
