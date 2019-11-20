@@ -123,7 +123,7 @@ function addColumn(table_id, md_cate_cd, store) {
 			xtype : 'numberfield',
 			name : 'display_order',
 			fieldLabel : '显示顺序',
-			allowBlank : true,
+			allowBlank : false,
 			anchor : '91%'
 		}]
 	});

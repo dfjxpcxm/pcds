@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.MalformedURLException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -681,7 +683,6 @@ public class PageManagerCtrlr extends BaseCtrlr {
 		String uploadPath =basePath+ "/upload/template/";
 		//上传文件返回文件名
 		String fullFileName = FileUpload.uploadFileIo(request, response, tempPath, uploadPath);
-		
 		boolean isParent = relaValues == null || "".equals(relaValues) || "null".equals(relaValues);
 		try {
 			List<Map<String,List<List<String>>>> data = null;
@@ -689,6 +690,8 @@ public class PageManagerCtrlr extends BaseCtrlr {
 				data = Read2007ExcelWrapper.readXls(fullFileName, 0, true);
 			}else if(fullFileName.endsWith("xlsx")){
 				data = Read2007ExcelWrapper.readXlsx(fullFileName, 0);
+			}else if(fullFileName.endsWith("csv")){
+				data = Read2007ExcelWrapper.readCsv(fullFileName);
 			}else {
 				new File(fullFileName).delete();
 				rtnMsg = getJsonstrResponse("文件格式有误,上传文件只支持excel文件", false);
@@ -1187,11 +1190,39 @@ public class PageManagerCtrlr extends BaseCtrlr {
 			}
 			
 			//开始生成Excel模板
-	        HSSFWorkbook workbook = ExportDataUtil.expTemplate(sheetList);
-	        response.setContentType ("application/ms-excel") ;
-	        response.setHeader("Content-Disposition", "attachment; filename=" + new String((tempName+"_"+sheetName).getBytes("gb2312"),"iso-8859-1") + ".xls");
+	       // HSSFWorkbook workbook = ExportDataUtil.expTemplate(sheetList);
+//			response.setContentType ("application/ms-excel") ;//+ new String((tempName+"_"+sheetName).getBytes("gb2312"),"iso-8859-1") +
+//			response.setHeader("Content-Disposition", "attachment; filename="  + URLEncoder.encode(tempName+"_"+sheetName, enc) +".xls");
+//			stream = response.getOutputStream();
+			//workbook.write(stream);
+			Map<String,List<String>> excelHeadData  = (Map<String, List<String>>) sheetList.get(0).get("excelHeadData");
+			int len = excelHeadData.size();
+			byte[] buffer = new byte[1024];
+			String os = System.getProperty("os.name");
+			String enc = "UTF-8";
+			response.setCharacterEncoding(enc);
+			response.setContentType ("application/csv") ;//+ new String((tempName+"_"+sheetName).getBytes("gb2312"),"iso-8859-1") +
+	        response.setHeader("Content-Disposition", "attachment; filename="  + URLEncoder.encode(tempName+"_"+sheetName, enc) +".csv");
 			stream = response.getOutputStream();
-			workbook.write(stream);
+
+			StringBuilder stringBuilder = new StringBuilder();
+			for(Entry<String,List<String>> entry : excelHeadData.entrySet()){
+				String key = entry.getKey();
+				List<String> dataVal = entry.getValue();
+				String [] cellConfig = key.split("#"); //单元格配置
+				String cellText = cellConfig[0];
+				if (len == 1){
+					stringBuilder.append(cellText);
+					break;
+				}
+				stringBuilder.append(cellText.concat(","));
+				len--;
+//				String cellType = cellConfig[1];
+//				String mustInput = cellConfig[2];
+//				String cellFormula = cellConfig.length>3 ? cellConfig[3] : "";
+			}
+			stream.write(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
+			stream.write(stringBuilder.toString().getBytes(enc));
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

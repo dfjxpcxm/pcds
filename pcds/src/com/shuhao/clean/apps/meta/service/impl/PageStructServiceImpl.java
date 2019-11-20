@@ -98,7 +98,7 @@ public class PageStructServiceImpl implements IPageStructService {
 			pageFieldService.addPageFieldFromTable(fieldParams);
 		}
 		
-		//封装表单元数据(新增表单)
+		//封装表单元数据()
 		UppMetadata addFormMetadata = this.initMetadata(page_metadata_id,MetaConstant.CATEGORY_TYPE_FORM, user_id,"新增表单");
 		//封装表单 (新增表单)
 		UppPageStruct addFormPageStruct = this.initPageStrut(addFormMetadata);
@@ -140,7 +140,7 @@ public class PageStructServiceImpl implements IPageStructService {
 		initButtonDisplayOrder(toolbarButtonList);
 		for(int i = 0;i < toolbarButtonList.size();i++){
 			UppPageButton button = toolbarButtonList.get(i);
-			if("01".equals(button.getButton_func_cd())){
+			if("01".equals(button.getButton_func_cd()) || "15".equals(button.getButton_func_cd())){
 				button.setRela_metadata_id(addFormMetadata.getMetadata_id());
 			}else if("02".equals(button.getButton_func_cd())){
 				button.setRela_metadata_id(updateFormMetadata.getMetadata_id());
@@ -279,7 +279,7 @@ public class PageStructServiceImpl implements IPageStructService {
 		
 		//增加一个复制按钮
 		buttonFuncMap = new HashMap<String, Object>();
-		buttonFuncMap.put("button_func_cd", "01");
+		buttonFuncMap.put("button_func_cd", "15");
 		buttonFuncMap.put("button_func_name", "复制");
 		UppPageButton copyButton = this.initPageButton(buttonFuncMap,MetaConstant.CATEGORY_TYPE_TOOLBAR_BUTTON,prt_metada_id,user_id);
 		resultList.add(2,copyButton);
@@ -313,7 +313,7 @@ public class PageStructServiceImpl implements IPageStructService {
 	private String[] getFuncArray(String md_cate_cd,String formType){
 		String[] buttonFunc = null;
 		if(MetaConstant.CATEGORY_TYPE_TOOLBAR_BUTTON.equals(md_cate_cd)){
-			//工具条按钮初始化类型  01 新增 02 编辑 03 删除  07 导入 08 导出 
+			//工具条按钮初始化类型  01 新增 02 编辑 03 删除  07 导入 08 导出
 			buttonFunc = new String[]{"01","02","03","07","08"};
 		}else if(MetaConstant.CATEGORY_TYPE_FORM_BUTTON.equals(md_cate_cd)){
 			if("add".equals(formType)){

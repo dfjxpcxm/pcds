@@ -146,18 +146,21 @@ Ext.onReady(function(){
 				name : 'max_value',
 				id : 'max_value',
 				fieldLabel : '最大值',
+				allowBlank : false,
 				anchor : formItemAnchor
 			}, {
 				xtype : 'textfield',
 				name : 'min_value',
 				id : 'min_value',
-				fieldLabel : '最小值',
+				fieldLabel : '最小值111',
+				allowBlank : false,
 				anchor : formItemAnchor
 			}, {
 				xtype : 'textfield',
 				name : 'max_length',
 				id : 'max_length',
 				fieldLabel : '最大长度',
+				allowBlank : false,
 				anchor : formItemAnchor
 			}
 			]

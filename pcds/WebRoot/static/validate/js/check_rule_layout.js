@@ -272,6 +272,7 @@ MyViewportUi = Ext.extend(Ext.Viewport, {
 											name : 'chk_priority',
 											id : 'chk_priority',
 											fieldLabel : '校验优先级',
+										allowBlank : false,
 											anchor : '95%'
 										}
 								]
@@ -315,6 +316,7 @@ MyViewportUi = Ext.extend(Ext.Viewport, {
 											name : 'display_order',
 											id : 'display_order',
 											fieldLabel : '显示顺序',
+											allowBlank : false,
 											anchor : '95%'
 										}
 								]

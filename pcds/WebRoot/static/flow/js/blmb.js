@@ -240,8 +240,8 @@ function doAddNode(tree){
 						fieldLabel : '关联字段',
 						anchor : '100%',
 						readOnly : true,
-						disabled :(node.id=='root' || node.attributes.attr1=='01'),
-						allowBlank:(node.id=='root' || node.attributes.attr1=='01'),
+						disabled :true,//(node.id=='root' || node.attributes.attr1=='01')     true禁用了改选项框输入
+						allowBlank:true,//(node.id=='root' || node.attributes.attr1=='01')
 						listeners : {
 							'focus' : function (){
 								showWin();

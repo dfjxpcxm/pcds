@@ -118,7 +118,7 @@
 	</select>
 	
 	<select id="getApplyListCount" parameterType="map" resultType="int">
-		select count(1) from (<include refid="getApplyListSql"/>)
+		select count(1) from (<include refid="getApplyListSql"/>) e
 	</select>
 	
 	<sql id="getApplyListSql">
@@ -227,7 +227,7 @@
 	</select>
 	
 	<select id="getApproveListCount" parameterType="map" resultType="int">
-		select count(1) from (<include refid="getApproveListSql"/>)
+		select count(1) from (<include refid="getApproveListSql"/>) e
 	</select>
 	
 	<sql id="getApproveListSql">

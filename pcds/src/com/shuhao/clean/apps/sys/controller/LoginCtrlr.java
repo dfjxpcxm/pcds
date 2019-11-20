@@ -151,7 +151,7 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 		if(null == userId || "".equals(userId) || "null".equals(userId)){
 			userId = CookieUtil.getValue(request, SynchronizedDataConstants.CAS_LOGIN_USER);
 			if (StringUtil.isNullStr(userId)){
-				userId = "admin";
+				userId = "00000";
 				System.out.println("*********************取得cas用户名失败，设置为默认管理员【admin】！------------------");
 			}
 		}
