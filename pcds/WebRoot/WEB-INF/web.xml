@@ -149,25 +149,22 @@
 	</session-config>
 
 	<!--cas单点登录 -->
+	<!--
 	<filter>
 		<filter-name>CAS Single Sign Out Filter</filter-name>
 		<filter-class>org.jasig.cas.client.session.SingleSignOutFilter</filter-class>
 		<init-param>
 			<param-name>casServerUrlPrefix</param-name>
-			<!--<param-value>https://127.0.0.1:8443/cas/logout</param-value>-->
 			<param-value>http://118.126.103.216:17001/cas/logout</param-value>
 		</init-param>
 	</filter>
-
 	<filter-mapping>
 		<filter-name>CAS Single Sign Out Filter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-
 	<listener>
 		<listener-class>org.jasig.cas.client.session.SingleSignOutHttpSessionListener</listener-class>
 	</listener>
-
 	<filter>
 		<filter-name>CAS Authentication Filter</filter-name>
 		<filter-class>org.jasig.cas.client.authentication.AuthenticationFilter</filter-class>
@@ -178,7 +175,7 @@
 		</init-param>
 		<init-param>
 			<param-name>serverName</param-name>
-			<param-value>http://localhost:8080/pcds/</param-value>
+			<param-value>http://106.52.132.19:8090/pcds/</param-value>
 		</init-param>
 	</filter>
 
@@ -191,7 +188,7 @@
 		</init-param>
 		<init-param>
 			<param-name>serverName</param-name>
-			<param-value>http://localhost:8080/pcds/</param-value>
+			<param-value>http://106.52.132.19:8090/pcds/</param-value>
 		</init-param>
 		<init-param>
 			<param-name>redirectAfterValidation</param-name>
@@ -226,6 +223,7 @@
 		<filter-name>CAS HttpServletRequest Wrapper Filter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
+	-->
 	<!--cas单点登录end -->
 
 	<!-- 初始页  -->

@@ -1,5 +1,7 @@
 package com.shuhao.clean.utils;
 
+import org.apache.axis2.databinding.types.soapencoding.DateTime;
+
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -87,7 +89,7 @@ public class CommonUtil
 		}
 	}
 
-	public static String format(Date date, String format)
+	public static String format(DateTime date, String format)
 	{
 		String value = date.toString();
 		try

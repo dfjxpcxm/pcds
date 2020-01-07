@@ -1,6 +1,8 @@
 package com.shuhao.clean.apps.sys.controller;
 
 import java.security.Principal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -17,8 +19,12 @@ import com.shuhao.clean.apps.sys.synchrodata.Dom4jUtil;
 import com.shuhao.clean.apps.sys.synchrodata.PropertiesUtil;
 import com.shuhao.clean.apps.sys.synchrodata.SynchronizedDataConstants;
 import com.shuhao.clean.apps.sys.synchrodata.WebClient;
+import com.shuhao.clean.utils.CommonUtil;
+import com.shuhao.clean.utils.CommonUtils;
 import com.shuhao.clean.utils.StringUtil;
-import org.apache.log4j.Logger;
+import org.apache.axis2.databinding.types.soapencoding.DateTime;
+//import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,6 +43,9 @@ import com.shuhao.clean.utils.Md5Util;
 
 import org.apache.commons.lang3.StringUtils;
 
+import org.slf4j.Logger;
+
+
 /**
  * <p>Title: 登录控制类，所有controller类的父类</p>
  * <p>Description: 包含servlet api,封装部分返回map方法，通过ResponseBody返回json，<br>
@@ -52,7 +61,9 @@ import org.apache.commons.lang3.StringUtils;
 @Controller
 @RequestMapping(value="/login")
 public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
-	private Logger log = Logger.getLogger(LoginCtrlr.class);
+//	private Logger log = Logger.getLogger(LoginCtrlr.class);
+
+	static Logger log = LoggerFactory.getLogger(LoginCtrlr.class);
 	@Autowired
 	private IUserService userService ;
 	
@@ -141,12 +152,7 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 	@RequestMapping(value="doLogin")
 	@ResponseBody
 	public String doLogin() throws Exception {
-		//获取前端登陆参数
-//		String user_id = request.getParameter("user_id");
-//		String password = request.getParameter("password");
-//        String user_id ="";
-
-		//获取前端登陆参数
+		//获取CAS前端登陆参数
 		String userId = getCasLoginUsername();
 		if(null == userId || "".equals(userId) || "null".equals(userId)){
 			userId = CookieUtil.getValue(request, SynchronizedDataConstants.CAS_LOGIN_USER);
@@ -155,63 +161,56 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 				System.out.println("*********************取得cas用户名失败，设置为默认管理员【admin】！------------------");
 			}
 		}
-
 		//根据输入用户名查询用户列表
 		SysUserInfo user = userService.findUserById(userId);
 		if(user == null){
+				//同步用户数据
 			List<Map<String,Object>> list = this.getPortalUser(userId);
 			if(null !=list && list.size()>0){
-				//同步用户数据
+				//增加用户数据及用户与角色数据
 				getUserInfo(list);
 			}
 			//同步机构数据
 			List<Map<String,Object>> orgList = this.getPortalOrgInfo(userId);
 			if(null !=orgList && orgList.size()>0){
-				//同数据
+				//增加机构数据及用户与机构数据
 				getOrgInfo(orgList);
 			}
-
 			user = userService.findUserById(userId);
 		}
 		//JSON返回结果Map
 		Map<String, Object> results = new HashMap<String, Object>();
 		try {
-			//根据输入用户名查询用户列表
-//			SysUserInfo user = userService.findUserById(user_id);
 			//判断用户不存在的情况
 			if(user == null){
 				log.info("不存在用户["+userId+"]");
 				results.put("info", "不存在用户["+userId+"]");
 				return  null;
 			}
-			//验证密码是否一致
-	/*		password = Md5Util.getPasswordForMD5(password);
-			if(!user.getPassword().equals(password)){
-				log.info("用户["+user_id+"]密码输入错误");
-			}*/
 			//登陆成功处理
 			session.setAttribute(CURRENT_USER, user);
 			//加载系统时间
 			session.setAttribute(SYS_DATE, loginService.getSysDate());
-			//当前月
 			String currentMonth = loginService.getCurrentMonth();
 			session.setAttribute(CURRENT_MONTH, currentMonth);
             session.setAttribute("casUrl",this.getServerIp());
-			//全部菜单
-//			session.setAttribute("AllResource", resourceService.getAllResource());
 			//用户菜单
 			session.setAttribute(USER_RESOURCE, resourceService.getUserResource(user));
-
-			//登录成功之后记录登录日志
-//			String loginIP = this.getUserIP(request);
-//			sessionLogWriter.addSessionLog(session.getId(), user, loginIP);
-
 		} catch (Exception e) {
 			e.printStackTrace();
 			results.put("info", e.getMessage());
-
 		}
-		((HttpServletResponse)response).sendRedirect(
+
+			String operatedUser = "系统操作员编号:"+userId+"系统操作员名称:"+user.getUser_name();
+			String operateType = "数据补录系统->登录日志";
+			String requestResult = "系统操作员:"+userId+"登录数据补录系统服务日志";
+			String operLog = "用户登录数据补录系统服务日志->登录日志";
+			String serviceName = "服务名称:登录日志;服务方法名:";
+			String ip = CommonUtils.getIpAddrAdvanced(request);
+
+			loggerLogInfo(userId,operatedUser,operateType,requestResult,operLog,serviceName,ip);
+
+			((HttpServletResponse)response).sendRedirect(
 				((HttpServletRequest)request).getContextPath()+"/main.jsp");
 		return  null;
 	}
@@ -256,16 +255,6 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 //			session.setAttribute("AllResource", resourceService.getAllResource());
 			//用户菜单
 			session.setAttribute(USER_RESOURCE, resourceService.getUserResource(user));
-			
-			//初始化年份
-//			Map<String, Object> paramMap = new HashMap<String, Object>();
-//			paramMap.put("year_id",  currentMonth.substring(0, 4));
-//			paramMap.put("owner_id",  user.getBank_org_id());
-//			this.userService.initSysYear(paramMap);
-			
-			//登录成功之后记录登录日志
-//			String loginIP = this.getUserIP(request);
-//			sessionLogWriter.addSessionLog(session.getId(), user, loginIP);
 
 			result.put("status", "true");
 			JSONObject jsonObj = new JSONObject(result);
@@ -294,6 +283,15 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 	@ResponseBody
 	public Map<String, Object> doLogout(HttpServletRequest request,HttpServletResponse response) throws Exception {
 		Map<String, Object> results = new HashMap<String, Object>();
+		SysUserInfo userInfo =(SysUserInfo) session.getAttribute(LoginConstant.CURRENT_USER);
+		String userId = userInfo.getUser_id();
+		String operatedUser = "系统操作员编号:"+userId+"系统操作员名称:"+userInfo.getUser_name();
+		String operateType = "数据补录系统->退出系统日志";
+		String requestResult = "系统操作员:"+userId+"登录数据补录系统服务日志";
+		String operLog = "用户登录数据补录系统服务日志->退出系统日志";
+		String serviceName = "服务名称:退出系统日志;服务方法名:";
+		String ip = CommonUtils.getIpAddrAdvanced(request);
+		loggerLogInfo(userId,operatedUser,operateType,requestResult,operLog,serviceName,ip);
 		try {
 			HttpSession session = request.getSession();
 			Enumeration<String> e = session.getAttributeNames();
@@ -310,6 +308,8 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 				cookie.setPath("/");
 				response.addCookie(cookie);
 			}
+
+
 			this.sessionLogWriter.logOutLog(session.getId());
 			session.invalidate();
 			return doSuccessInfoResponse("退出成功");
@@ -449,7 +449,7 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 	public  String getServerIp(){
 		String casUrl = PropertiesUtil.getPropery("cas.server.ip");
 		String path = request.getScheme() + "://" + request.getServerName()
-				+ ":" + request.getServerPort();
+				+ ":8080";
 		String retProtalUrl = path.concat("/pcmss");
 		String logoutUrl = casUrl.concat("/logout?service=").concat(urlEncode(retProtalUrl));
 		return logoutUrl;
@@ -463,6 +463,27 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 		} catch (Exception ex) {
 			return str;
 		}
+	}
+
+
+	public  void loggerLogInfo( String userName, String operatedUser, String operateType, String requestResult, String operLog, String serviceName, String ip) {
+
+		String clazz = Thread.currentThread().getStackTrace()[1].getClassName();
+		String method = Thread.currentThread().getStackTrace()[1].getMethodName();
+
+		serviceName = "服务名称:登录日志;服务方法名:";
+		String serName =serviceName+clazz+"->"+method;
+
+
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+
+		Date dt = new Date();
+		String loginTime = sdf.format(dt);
+
+		log.info("[{}]:[{}]:[{}]:[{}]:[{}]:[{}]:[{}]:[{}]:[{}]:[{}]",
+					userName, ip, serName, "数据补录系统", operateType, loginTime, loginTime, 1, "成功", requestResult);
+
+
 	}
 
 
