@@ -448,9 +448,10 @@ public class LoginCtrlr extends BaseCtrlr implements LoginConstant {
 
 	public  String getServerIp(){
 		String casUrl = PropertiesUtil.getPropery("cas.server.ip");
-		String path = request.getScheme() + "://" + request.getServerName()
-				+ ":8080";
-		String retProtalUrl = path.concat("/pcmss");
+//		String path = request.getScheme() + "://" + request.getServerName()
+//				+ ":8080";
+		//String retProtalUrl = path.concat("/pcmss");
+		String retProtalUrl = PropertiesUtil.getPropery("pcmss.server.url");
 		String logoutUrl = casUrl.concat("/logout?service=").concat(urlEncode(retProtalUrl));
 		return logoutUrl;
 	}

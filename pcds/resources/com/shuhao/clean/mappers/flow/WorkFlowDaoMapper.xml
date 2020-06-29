@@ -87,7 +87,7 @@
 	
 	<!-- fms修改 -->
 	<select id="getUserRole"  resultType="map">
-		select t.uuid nodeId,t.role_name nodeName from sys_role_info t
+		select t.role_id nodeId,t.role_name nodeName from sys_role_info t
 	</select>
 	
 	<select id="getPostInfo"  resultType="map">

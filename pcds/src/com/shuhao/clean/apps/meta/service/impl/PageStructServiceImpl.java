@@ -371,7 +371,15 @@ public class PageStructServiceImpl implements IPageStructService {
 		}else{
 			//如果是页面节点 表单节点 工具条节点 不进行级联删除
 			if(childList != null && childList.size()>0){
-				throw new Exception("请先删除子节点");
+				//throw new Exception("请先删除子节点");
+				String[] metadata_ids = getFieldsIdArray(childList);
+				//删除字段列表
+				pageFieldService.deletePageFieldBatch(metadata_ids);
+				//删除与表的映射
+				UppDicFnRela delRela = new UppDicFnRela();
+				delRela.setMetadata_id(page_struct_id);
+				pageRelaMetadataService.deleteDicFnRela(delRela);
+
 			}else{
 				if(MetaConstant.CATEGORY_TYPE_PAGE.equals(page_md_cate_cd)){
 					//删除与表的映射
